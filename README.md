@@ -14,16 +14,20 @@ ViTor adalah proyek editor video native Android ARM64 yang sedang dikembangkan u
 - [x] Membaca katalog konten sumber.
 - [x] Model data subtitle dengan timestamp milidetik dan timing per kata.
 - [x] Parser dan writer subtitle SRT.
-- [x] Editor video utama: import beberapa klip, preview, pilih/hapus klip di daftar timeline.
-- [x] Trim klip dengan rentang awal/akhir dan ekspor MP4 baru menggunakan Media3 Transformer.
-- [ ] Penyusunan beberapa klip menjadi satu hasil video.
-- [ ] Track audio terpisah, teks overlay, efek, transisi, dan rendering komposisi lengkap.
+- [x] Import beberapa klip, preview, pilih/hapus klip di timeline.
+- [x] Trim klip dengan rentang awal/akhir dan ekspor MP4 baru.
+- [x] Mengubah urutan klip di timeline.
+- [x] Menggabungkan urutan klip menjadi satu MP4 menggunakan Media3 Composition.
+- [ ] Track audio terpisah dan pencampuran musik latar.
+- [ ] Teks overlay, efek, transisi, dan rendering komposisi lengkap.
 - [ ] UI track subtitle dan penyuntingan cue di timeline.
 - [ ] Mesin speech-to-text offline untuk vlog.
 - [ ] Pengenalan lirik dan penyelarasan per kata untuk video musik.
 
-## Status editor 0.4.0
-Fitur edit pertama yang aktif adalah trim. Pengguna memilih klip, menentukan titik awal dan akhir dengan dua handle, lalu ViTor merender file MP4 baru tanpa mengubah file sumber. Pada Android 10 ke atas, hasil dipublikasikan ke Galeri pada folder `Movies/ViTor`. Timeline saat ini mengelola klip yang diimpor; penggabungan beberapa klip belum tersedia.
+## Status editor 0.5.0
+ViTor dapat mengimpor beberapa video, mengatur urutan klip dengan tombol panah, memilih klip, memotong satu klip berdasarkan rentang waktu, dan mengekspor gabungan klip sebagai satu file MP4. Penggabungan menggunakan urutan kiri ke kanan pada timeline. Hasil ekspor disimpan pada folder `Movies/ViTor` di Galeri pada Android 10 ke atas. File sumber tidak dimodifikasi.
+
+Penggabungan bergantung pada dukungan codec dan track dari perangkat melalui Media3 Transformer. Jika format audio/video antar klip tidak kompatibel atau tidak didukung perangkat, proses ekspor dapat gagal dan aplikasi harus menampilkan pesan kesalahan. Belum ada crossfade/transisi antar klip.
 
 ## Rencana Auto Caption dan Auto Lyrics
 Targetnya adalah pemrosesan audio lokal di perangkat, dengan model yang dapat diunduh/dikelola terpisah dari APK. Speech-to-text untuk vlog dan pengenalan lirik lagu diperlakukan sebagai dua mode berbeda. Hasil pengenalan harus dapat dikoreksi manual. Mode lirik membutuhkan word-level alignment agar sorotan karaoke mengikuti audio.
@@ -35,4 +39,4 @@ Referensi teknis yang sedang dievaluasi:
 Belum ada engine ASR yang terintegrasi di APK saat ini. Tidak ada tombol Auto Caption/Auto Lyrics yang boleh ditampilkan sebagai fitur aktif sebelum pipeline audio, model, timestamp, dan pengujian perangkat selesai.
 
 ## Pengujian
-GitHub Actions menjalankan unit test sebelum membangun APK debug. Uji perangkat ARM64 tetap diperlukan untuk memvalidasi performa, konsumsi memori, dukungan codec, dan hasil pengenalan.
+GitHub Actions menjalankan unit test sebelum membangun APK debug. Uji perangkat ARM64 tetap diperlukan untuk memvalidasi penggabungan file dengan berbagai codec, performa, konsumsi memori, dan hasil rendering. Build CI yang sukses hanya membuktikan kompilasi dan unit test, bukan pengujian runtime di perangkat.
