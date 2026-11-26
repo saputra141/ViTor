@@ -13,18 +13,24 @@ ViTor adalah proyek editor video native Android ARM64 yang sedang dikembangkan u
 - [x] Import video lokal dan preview Media3.
 - [x] Membaca katalog konten sumber.
 - [x] Model data subtitle dengan timestamp milidetik dan timing per kata.
-- [x] Parser dan writer subtitle SRT, termasuk teks multi-baris dan variasi line ending.
+- [x] Parser dan writer subtitle SRT.
+- [x] Editor video utama: import beberapa klip, preview, pilih/hapus klip di daftar timeline.
+- [x] Trim klip dengan rentang awal/akhir dan ekspor MP4 baru menggunakan Media3 Transformer.
+- [ ] Penyusunan beberapa klip menjadi satu hasil video.
+- [ ] Track audio terpisah, teks overlay, efek, transisi, dan rendering komposisi lengkap.
 - [ ] UI track subtitle dan penyuntingan cue di timeline.
 - [ ] Mesin speech-to-text offline untuk vlog.
 - [ ] Pengenalan lirik dan penyelarasan per kata untuk video musik.
-- [ ] Timeline editing, audio, efek, transisi, dan rendering/export.
+
+## Status editor 0.4.0
+Fitur edit pertama yang aktif adalah trim. Pengguna memilih klip, menentukan titik awal dan akhir dengan dua handle, lalu ViTor merender file MP4 baru tanpa mengubah file sumber. Pada Android 10 ke atas, hasil dipublikasikan ke Galeri pada folder `Movies/ViTor`. Timeline saat ini mengelola klip yang diimpor; penggabungan beberapa klip belum tersedia.
 
 ## Rencana Auto Caption dan Auto Lyrics
 Targetnya adalah pemrosesan audio lokal di perangkat, dengan model yang dapat diunduh/dikelola terpisah dari APK. Speech-to-text untuk vlog dan pengenalan lirik lagu diperlakukan sebagai dua mode berbeda. Hasil pengenalan harus dapat dikoreksi manual. Mode lirik membutuhkan word-level alignment agar sorotan karaoke mengikuti audio.
 
 Referensi teknis yang sedang dievaluasi:
-- sherpa-onnx mendukung speech recognition lokal/offline dan menyediakan contoh Android/Kotlin serta forced alignment: https://github.com/k2-fsa/sherpa-onnx
-- whisper.cpp memiliki contoh Android untuk transkripsi file audio; model Whisper perlu disediakan terpisah: https://github.com/ggml-org/whisper.cpp/tree/master/examples/whisper.android
+- sherpa-onnx: https://github.com/k2-fsa/sherpa-onnx
+- whisper.cpp Android: https://github.com/ggml-org/whisper.cpp/tree/master/examples/whisper.android
 
 Belum ada engine ASR yang terintegrasi di APK saat ini. Tidak ada tombol Auto Caption/Auto Lyrics yang boleh ditampilkan sebagai fitur aktif sebelum pipeline audio, model, timestamp, dan pengujian perangkat selesai.
 
