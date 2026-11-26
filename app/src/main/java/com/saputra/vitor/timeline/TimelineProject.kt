@@ -1,5 +1,7 @@
 package com.saputra.vitor.timeline
 
+import com.saputra.vitor.subtitles.SubtitleCue
+
 /**
  * Serializable-by-fields project model. All timeline positions and source ranges use milliseconds.
  * URIs are stored as strings so the model remains independent of Android framework classes.
@@ -65,13 +67,15 @@ data class TimelineProject(
     val name: String = "Untitled project",
     val videoClips: List<VideoClip> = emptyList(),
     val audioLayers: List<AudioLayer> = emptyList(),
-    val textLayers: List<TextLayer> = emptyList()
+    val textLayers: List<TextLayer> = emptyList(),
+    val subtitleCues: List<SubtitleCue> = emptyList()
 ) {
     init {
         require(name.isNotBlank())
         require(videoClips.map { it.id }.distinct().size == videoClips.size)
         require(audioLayers.map { it.id }.distinct().size == audioLayers.size)
         require(textLayers.map { it.id }.distinct().size == textLayers.size)
+        require(subtitleCues.map { it.id }.distinct().size == subtitleCues.size)
     }
 
     /** Video clips are concatenated in list order; audio and text layers use absolute timeline time. */
@@ -79,7 +83,8 @@ data class TimelineProject(
     val durationMs: Long get() = maxOf(
         videoDurationMs,
         audioLayers.filterNot { it.muted }.maxOfOrNull { it.timelineEndMs } ?: 0L,
-        textLayers.maxOfOrNull { it.endMs } ?: 0L
+        textLayers.maxOfOrNull { it.endMs } ?: 0L,
+        subtitleCues.maxOfOrNull { it.endMs } ?: 0L
     )
 
     fun moveVideoClip(fromIndex: Int, toIndex: Int): TimelineProject {
