@@ -143,9 +143,14 @@ private fun VideoEditorScreen() {
             ) {
                 if (selected != null) {
                     AndroidView(
-                        Modifier.fillMaxSize(),
-                        factory = { PlayerView(it).apply { this.player = player; useController = true } },
-                        update = { it.player = player }
+                        factory = { viewContext ->
+                            PlayerView(viewContext).apply {
+                                this.player = player
+                                useController = true
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        update = { playerView -> playerView.player = player }
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
