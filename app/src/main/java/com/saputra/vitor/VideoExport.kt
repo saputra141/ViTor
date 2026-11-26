@@ -68,7 +68,7 @@ fun exportMergedClips(
     val editedItems = clipUris.map { uri ->
         EditedMediaItem.Builder(MediaItem.fromUri(uri)).build()
     }
-    val videoSequence = EditedMediaItemSequence.withAudioAndVideoFrom(editedItems)
+    val videoSequence = EditedMediaItemSequence.Builder(editedItems).build()
     val composition = Composition.Builder(videoSequence).build()
 
     startExport(
