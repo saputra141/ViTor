@@ -1,24 +1,25 @@
 # ViTor
 
-ViTor adalah proyek Android ARM64 untuk membangun ulang pengalaman editor video Gebang Editor dalam aplikasi native Android.
+ViTor adalah proyek porting native Android ARM64 untuk mengadaptasi alur editor video Gebang Editor.
+
+## Sumber asli yang dipakai
+- Katalog konten resmi: https://github.com/gebangkiidiw/GebangEditor-Konten
+- Katalog JSON disalin apa adanya ke `app/src/main/assets/gebang/katalog.json`.
+- Thumbnail diambil dari URL sumber yang tercantum di katalog.
+- Nama item, kategori, status premium/gratis, dan daftar nama file tidak dibuat ulang oleh ViTor.
+
+## Batas sumber yang tersedia
+Repositori publik Gebang Editor yang diperiksa menyediakan katalog konten dan paket rilis desktop, tetapi tidak menyediakan source code mesin editor Android atau desktop. Paket desktop yang tersedia adalah binary Windows/macOS; binary itu bukan APK dan tidak dapat langsung dijalankan sebagai aplikasi Android. Karena itu, ViTor belum bisa diklaim setara dengan Gebang Editor.
 
 ## Status
-- [x] Repository Android diinisialisasi.
-- [x] Kerangka aplikasi native Kotlin + Jetpack Compose.
-- [ ] Import media dan pemilih file.
-- [ ] Timeline video/audio.
-- [ ] Teks, layer, dan efek.
+- [x] Kerangka Android native Kotlin + Jetpack Compose.
+- [x] Import video lokal dan preview Media3.
+- [x] Membaca katalog asli 78 item dari aset sumber.
+- [x] Menampilkan thumbnail asli dari URL yang tercantum di katalog.
+- [ ] Mengurai dan menerapkan format preset/efek asli.
+- [ ] Timeline editing, trim, audio, teks, dan layer fungsional.
 - [ ] Rendering dan ekspor video.
-- [ ] Pengujian pada perangkat ARM64.
-
-## Catatan porting
-Repository publik Gebang Editor yang telah diperiksa menyediakan rilis aplikasi desktop dan katalog konten, tetapi belum menyediakan source code mesin editornya. Karena itu ViTor dimulai sebagai pembangunan ulang native Android; kerangka ini belum mengandung seluruh mesin atau fitur Gebang Editor. Jangan menganggap APK sudah setara dengan aplikasi desktop sampai setiap fitur diimplementasikan dan diuji.
+- [ ] Pengujian perangkat ARM64.
 
 ## Build
-Build debug dilakukan melalui GitHub Actions pada workflow **Android CI**. APK hasil build tersedia sebagai artifact jika workflow berhasil.
-
-## Target awal
-- Android ARM64
-- Kotlin
-- Jetpack Compose
-- Minimum Android 8.0 (API 26)
+GitHub Actions workflow **Android CI** membangun APK debug.
