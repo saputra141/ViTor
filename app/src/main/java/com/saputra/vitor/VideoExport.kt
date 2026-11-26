@@ -7,16 +7,27 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.graphics.Color as AndroidColor
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.EditedMediaItemSequence
+import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import androidx.media3.effect.Contrast
+import androidx.media3.effect.OverlayEffect
+import androidx.media3.effect.OverlaySettings
+import androidx.media3.effect.RgbFilter
+import androidx.media3.effect.TextOverlay
 import java.io.File
 import java.io.FileInputStream
+
+enum class VideoLook { ORIGINAL, GRAYSCALE, HIGH_CONTRAST }
 
 /** Exports a selected time range as a new MP4. The source file is never modified. */
 @UnstableApi
@@ -30,7 +41,6 @@ fun exportTrimmedClip(
 ) {
     require(startMs >= 0L && endMs > startMs) { "Rentang potong tidak valid." }
     val outputFile = createOutputFile(context)
-
     val clippedItem = MediaItem.Builder()
         .setUri(uri)
         .setClippingConfiguration(
@@ -40,46 +50,100 @@ fun exportTrimmedClip(
                 .build()
         )
         .build()
-
-    startExport(
-        context = context,
-        outputFile = outputFile,
-        onComplete = onComplete,
-        onFailure = onFailure
-    ) { transformer ->
+    startExport(context, outputFile, onComplete, onFailure) { transformer ->
         transformer.start(clippedItem, outputFile.absolutePath)
     }
 }
 
 /**
- * Concatenates clips in the exact order supplied by the editor timeline.
- * Media3 transcodes incompatible inputs as needed; unsupported codec/track
- * combinations are reported through onFailure instead of silently dropping clips.
+ * Exports a multi-layer edit: ordered video clips, optional looping background music,
+ * optional static title overlay, and a GPU video look.
  */
+@UnstableApi
+fun exportEditedProject(
+    context: Context,
+    clipUris: List<Uri>,
+    musicUri: Uri?,
+    musicVolume: Float,
+    titleText: String,
+    look: VideoLook,
+    onComplete: (String?) -> Unit,
+    onFailure: (String) -> Unit
+) {
+    require(clipUris.isNotEmpty()) { "Tambahkan minimal satu klip video." }
+    require(musicVolume in 0f..1f) { "Volume musik harus antara 0 dan 100%." }
+
+    val overlayEffects = buildList<androidx.media3.common.Effect> {
+        when (look) {
+            VideoLook.ORIGINAL -> Unit
+            VideoLook.GRAYSCALE -> add(RgbFilter.createGrayscaleFilter())
+            VideoLook.HIGH_CONTRAST -> add(Contrast(0.35f))
+        }
+        if (titleText.isNotBlank()) {
+            val text = SpannableString(titleText.trim()).apply {
+                setSpan(
+                    ForegroundColorSpan(AndroidColor.WHITE),
+                    0,
+                    length,
+                    SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            val settings = OverlaySettings.Builder()
+                .setBackgroundFrameAnchor(0f, -0.78f)
+                .setOverlayFrameAnchor(0f, 0f)
+                .build()
+            add(OverlayEffect(listOf(TextOverlay.createStaticTextOverlay(text, settings))))
+        }
+    }
+
+    val videoItems = clipUris.map { uri ->
+        EditedMediaItem.Builder(MediaItem.fromUri(uri))
+            .setEffects(Effects(emptyList(), overlayEffects))
+            .build()
+    }
+    val videoSequence = EditedMediaItemSequence.Builder(videoItems).build()
+    val sequences = mutableListOf(videoSequence)
+
+    if (musicUri != null) {
+        val musicEffects = if (musicVolume < 0.999f) {
+            listOf(GainAudioProcessor(musicVolume))
+        } else {
+            emptyList()
+        }
+        val musicItem = EditedMediaItem.Builder(MediaItem.fromUri(musicUri))
+            .setRemoveVideo(true)
+            .setEffects(Effects(musicEffects, emptyList()))
+            .build()
+        sequences.add(
+            EditedMediaItemSequence.Builder(musicItem)
+                .setIsLooping(true)
+                .build()
+        )
+    }
+
+    val composition = Composition.Builder(sequences).build()
+    val outputFile = createOutputFile(context)
+    startExport(context, outputFile, onComplete, onFailure) { transformer ->
+        transformer.start(composition, outputFile.absolutePath)
+    }
+}
+
 @UnstableApi
 fun exportMergedClips(
     context: Context,
     clipUris: List<Uri>,
     onComplete: (String?) -> Unit,
     onFailure: (String) -> Unit
-) {
-    require(clipUris.size >= 2) { "Pilih minimal dua klip untuk digabung." }
-    val outputFile = createOutputFile(context)
-    val editedItems = clipUris.map { uri ->
-        EditedMediaItem.Builder(MediaItem.fromUri(uri)).build()
-    }
-    val videoSequence = EditedMediaItemSequence.Builder(editedItems).build()
-    val composition = Composition.Builder(videoSequence).build()
-
-    startExport(
-        context = context,
-        outputFile = outputFile,
-        onComplete = onComplete,
-        onFailure = onFailure
-    ) { transformer ->
-        transformer.start(composition, outputFile.absolutePath)
-    }
-}
+) = exportEditedProject(
+    context = context,
+    clipUris = clipUris,
+    musicUri = null,
+    musicVolume = 1f,
+    titleText = "",
+    look = VideoLook.ORIGINAL,
+    onComplete = onComplete,
+    onFailure = onFailure
+)
 
 @UnstableApi
 private fun startExport(
@@ -92,7 +156,7 @@ private fun startExport(
     val listener = object : Transformer.Listener {
         override fun onCompleted(composition: Composition, exportResult: ExportResult) {
             val galleryUri = publishToGallery(context, outputFile)
-            onComplete(galleryUri?.toString())
+            onComplete(galleryUri?.toString() ?: outputFile.absolutePath)
         }
 
         override fun onError(
@@ -104,7 +168,6 @@ private fun startExport(
             onFailure(exportException.message ?: "Terjadi kesalahan saat merender video.")
         }
     }
-
     try {
         val transformer = Transformer.Builder(context)
             .addListener(listener)
@@ -132,7 +195,6 @@ private fun publishToGallery(context: Context, source: File): Uri? {
         )
         return null
     }
-
     val values = ContentValues().apply {
         put(MediaStore.Video.Media.DISPLAY_NAME, source.name)
         put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
@@ -140,17 +202,14 @@ private fun publishToGallery(context: Context, source: File): Uri? {
         put(MediaStore.Video.Media.IS_PENDING, 1)
     }
     val resolver = context.contentResolver
-    val destination = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
-        ?: return null
-
+    val destination = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: return null
     return try {
         resolver.openOutputStream(destination)?.use { output ->
             FileInputStream(source).use { input -> input.copyTo(output) }
         } ?: throw IllegalStateException("Tidak dapat membuka file tujuan.")
-        val completed = ContentValues().apply {
+        resolver.update(destination, ContentValues().apply {
             put(MediaStore.Video.Media.IS_PENDING, 0)
-        }
-        resolver.update(destination, completed, null, null)
+        }, null, null)
         destination
     } catch (_: Exception) {
         resolver.delete(destination, null, null)
