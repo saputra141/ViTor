@@ -62,6 +62,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.saputra.vitor.subtitles.SubtitleCue
+import com.saputra.vitor.subtitles.SrtCodec
 
 private data class EditClip(val uri: Uri, val name: String, val durationMs: Long)
 
@@ -94,6 +96,37 @@ private fun VideoEditorScreen() {
     var titleText by remember { mutableStateOf("") }
     var musicVolume by remember { mutableStateOf(0.75f) }
     var selectedLook by remember { mutableStateOf(VideoLook.ORIGINAL) }
+    val subtitleCues = remember { mutableStateListOf<SubtitleCue>() }
+
+    val subtitlePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    ?: throw IllegalStateException("File subtitle tidak bisa dibaca.")
+            }.onSuccess { source ->
+                runCatching { SrtCodec.parse(source) }
+                    .onSuccess { cues ->
+                        subtitleCues.clear()
+                        subtitleCues.addAll(cues)
+                        status = "${cues.size} subtitle berhasil diimpor."
+                    }
+                    .onFailure { status = "SRT tidak valid: ${it.message}" }
+            }.onFailure { status = "Gagal membaca subtitle: ${it.message}" }
+        }
+    }
+
+    val subtitleSaver = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/x-subrip")
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use {
+                    it.write(SrtCodec.write(subtitleCues.toList()))
+                } ?: throw IllegalStateException("File tujuan tidak bisa dibuka.")
+            }.onSuccess { status = "Subtitle berhasil disimpan sebagai SRT." }
+                .onFailure { status = "Gagal menyimpan SRT: ${it.message}" }
+        }
+    }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -294,6 +327,60 @@ private fun VideoEditorScreen() {
                     }
                     Text("Volume musik: ${(musicVolume * 100).toInt()}%", color = Color(0xFFAAAAB8), fontSize = 11.sp)
                     Slider(value = musicVolume, onValueChange = { musicVolume = it }, valueRange = 0f..1f, enabled = musicUri != null && !exporting)
+                }
+            }
+
+            Card(
+                Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1B23))
+            ) {
+                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("TRACK SUBTITLE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("${subtitleCues.size} baris subtitle", color = Color(0xFFBDB8FF), fontSize = 11.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { subtitlePicker.launch(arrayOf("application/x-subrip", "text/plain", "application/octet-stream")) }, enabled = !exporting) {
+                            Text("Import SRT")
+                        }
+                        OutlinedButton(onClick = { subtitleSaver.launch("ViTor_Subtitles.srt") }, enabled = !exporting && subtitleCues.isNotEmpty()) {
+                            Text("Ekspor SRT")
+                        }
+                        Button(onClick = {
+                            val nextStart = subtitleCues.lastOrNull()?.endMs ?: 0L
+                            subtitleCues.add(
+                                SubtitleCue(
+                                    id = "vitor-${System.currentTimeMillis()}",
+                                    startMs = nextStart,
+                                    endMs = nextStart + 2_000L,
+                                    text = "Subtitle baru"
+                                )
+                            )
+                        }, enabled = !exporting) { Text("Tambah") }
+                    }
+                    if (subtitleCues.isEmpty()) {
+                        Text("Impor file .srt atau tambah baris subtitle baru.", color = Color(0xFF9292A0), fontSize = 11.sp)
+                    } else {
+                        subtitleCues.toList().forEachIndexed { index, cue ->
+                            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("${formatTime(cue.startMs)} – ${formatTime(cue.endMs)}", color = Color(0xFFBDB8FF), fontSize = 10.sp, modifier = Modifier.weight(1f))
+                                    IconButton(onClick = { subtitleCues.remove(cue) }) {
+                                        Icon(Icons.Default.Delete, "Hapus subtitle", tint = Color(0xFFFF8A8A))
+                                    }
+                                }
+                                TextField(
+                                    value = cue.text,
+                                    onValueChange = { updated ->
+                                        if (updated.isNotBlank()) subtitleCues[index] = cue.copy(text = updated)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    label = { Text("Teks subtitle ${index + 1}") },
+                                    enabled = !exporting
+                                )
+                            }
+                        }
+                    }
+                    Text("Subtitle dapat diedit dan diekspor sebagai SRT. Subtitle belum dibakar ke video hasil render.", color = Color(0xFF9292A0), fontSize = 10.sp)
                 }
             }
 
