@@ -357,6 +357,7 @@ private fun VideoEditorScreen() {
                             titleText = titleText,
                             look = selectedLook,
                             clipRanges = clips.map { it.trimStartMs to it.trimEndMs },
+                            subtitleCues = subtitleCues.toList(),
                             onComplete = {
                                 exporting = false
                                 status = "Render selesai. File MP4 disimpan ke Movies/ViTor."
@@ -450,7 +451,7 @@ private fun VideoEditorScreen() {
                             }
                         }
                     }
-                    Text("Subtitle dapat diedit dan diekspor sebagai SRT. Subtitle belum dibakar ke video hasil render.", color = Color(0xFF9292A0), fontSize = 10.sp)
+                    Text("Subtitle dengan rentang waktu akan ditampilkan pada bagian video yang sesuai saat render MP4.", color = Color(0xFF9292A0), fontSize = 10.sp)
                 }
             }
 

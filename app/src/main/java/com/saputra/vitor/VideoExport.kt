@@ -1,6 +1,13 @@
 package com.saputra.vitor
 
 import android.content.ContentValues
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -19,6 +26,7 @@ import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import androidx.media3.effect.CanvasOverlay
 import androidx.media3.effect.Contrast
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.OverlaySettings
@@ -26,6 +34,7 @@ import androidx.media3.effect.RgbFilter
 import androidx.media3.effect.TextOverlay
 import java.io.File
 import java.io.FileInputStream
+import com.saputra.vitor.subtitles.SubtitleCue
 
 enum class VideoLook { ORIGINAL, GRAYSCALE, HIGH_CONTRAST }
 
@@ -69,7 +78,8 @@ fun exportEditedProject(
     look: VideoLook,
     onComplete: (String?) -> Unit,
     onFailure: (String) -> Unit,
-    clipRanges: List<Pair<Long, Long>>? = null
+    clipRanges: List<Pair<Long, Long>>? = null,
+    subtitleCues: List<SubtitleCue> = emptyList()
 ) {
     require(clipUris.isNotEmpty()) { "Tambahkan minimal satu klip video." }
     require(musicVolume in 0f..1f) { "Volume musik harus antara 0 dan 100%." }
@@ -100,6 +110,7 @@ fun exportEditedProject(
     require(clipRanges == null || clipRanges.size == clipUris.size) {
         "Jumlah rentang trim harus sama dengan jumlah klip."
     }
+    var timelineOffsetMs = 0L
     val videoItems = clipUris.mapIndexed { index, uri ->
         val range = clipRanges?.get(index)
         val mediaItem = if (range == null) {
@@ -116,8 +127,15 @@ fun exportEditedProject(
                 )
                 .build()
         }
+        val itemVideoEffects = buildList<androidx.media3.common.Effect> {
+            addAll(overlayEffects)
+            if (subtitleCues.isNotEmpty()) {
+                add(OverlayEffect(listOf(TimedSubtitleOverlay(subtitleCues, timelineOffsetMs))))
+            }
+        }
+        timelineOffsetMs += range?.let { (it.second - it.first).coerceAtLeast(0L) } ?: 0L
         EditedMediaItem.Builder(mediaItem)
-            .setEffects(Effects(emptyList(), overlayEffects))
+            .setEffects(Effects(emptyList(), itemVideoEffects))
             .build()
     }
     val videoSequence = EditedMediaItemSequence.Builder(videoItems).build()
@@ -234,6 +252,55 @@ private fun publishToGallery(context: Context, source: File): Uri? {
         resolver.delete(destination, null, null)
         null
     }
+}
+
+/**
+ * Draws the active subtitle cue at its timeline timestamp. The overlay is transparent
+ * outside cue ranges, so subtitle timing is preserved in the rendered MP4.
+ */
+@androidx.media3.common.util.UnstableApi
+private class TimedSubtitleOverlay(
+    private val cues: List<SubtitleCue>,
+    private val timelineOffsetMs: Long
+) : CanvasOverlay(true) {
+    private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = AndroidColor.WHITE
+        typeface = Typeface.create("sans-serif", Typeface.BOLD)
+        textAlign = Paint.Align.CENTER
+    }
+    private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = AndroidColor.argb(170, 0, 0, 0)
+        style = Paint.Style.FILL
+    }
+
+    override fun onDraw(canvas: Canvas, presentationTimeUs: Long) {
+        val timelineMs = timelineOffsetMs + presentationTimeUs / 1_000L
+        val cue = cues.firstOrNull { timelineMs >= it.startMs && timelineMs < it.endMs } ?: return
+        textPaint.textSize = (canvas.width * 0.045f).coerceIn(28f, 64f)
+        val maxTextWidth = (canvas.width * 0.88f).toInt().coerceAtLeast(1)
+        val layout = StaticLayout.Builder.obtain(
+            cue.text, 0, cue.text.length, textPaint, maxTextWidth
+        ).setAlignment(Layout.Alignment.ALIGN_CENTER)
+            .setIncludePad(false)
+            .build()
+        val horizontalPadding = canvas.width * 0.035f
+        val verticalPadding = textPaint.textSize * 0.35f
+        val left = (canvas.width - layout.width) / 2f - horizontalPadding
+        val top = canvas.height * 0.80f - verticalPadding
+        val right = left + layout.width + horizontalPadding * 2f
+        val bottom = top + layout.height + verticalPadding * 2f
+        canvas.drawRoundRect(RectF(left, top, right, bottom), 16f, 16f, backgroundPaint)
+        canvas.save()
+        canvas.translate((canvas.width - layout.width) / 2f, top + verticalPadding)
+        layout.draw(canvas)
+        canvas.restore()
+    }
+
+    override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings =
+        OverlaySettings.Builder()
+            .setBackgroundFrameAnchor(0f, -0.78f)
+            .setOverlayFrameAnchor(0f, 0f)
+            .build()
 }
 
 /** PCM gain processor used for the background music track during export. */
