@@ -23,7 +23,7 @@ ViTor adalah editor video native Android yang sedang dikembangkan dengan Kotlin,
 - Pengujian kompatibilitas codec, performa, dan stabilitas di perangkat nyata.
 
 ## Privasi dan pemrosesan
-Aplikasi dirancang untuk memproses file pilihan pengguna secara lokal. Aplikasi tidak memerlukan akun. Lihat draf kebijakan privasi di `docs/PRIVACY_POLICY_ID.md`; dokumen tersebut harus ditinjau dan dipublikasikan pada URL publik sebelum rilis.
+Aplikasi dirancang untuk memproses file pilihan pengguna secara lokal. Aplikasi tidak memerlukan akun. Email dukungan: koinklub@gmail.com. Lihat draf kebijakan privasi di `docs/PRIVACY_POLICY_ID.md`; dokumen tersebut harus ditinjau dan dipublikasikan pada URL publik sebelum rilis.
 
 ## Build
 CI menjalankan unit test dan membangun APK debug. Workflow rilis AAB membutuhkan upload keystore dan secret signing yang dikelola pemilik akun developer. Lihat `docs/PLAY_STORE_RELEASE_CHECKLIST_ID.md`.

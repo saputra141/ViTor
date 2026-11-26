@@ -19,7 +19,7 @@ Dokumen ini adalah daftar persiapan. Jangan menyatakan aplikasi siap rilis sebel
 - [ ] Lengkapi ikon aplikasi final dan ikon listing Google Play 512 x 512 PNG.
 - [ ] Siapkan feature graphic 1024 x 500 dan screenshot aktual dari aplikasi.
 - [ ] Tulis deskripsi singkat dan lengkap yang hanya menyebut fitur yang sudah benar-benar berfungsi.
-- [ ] Isi email kontak developer yang aktif.
+- [x] Email kontak developer: koinklub@gmail.com.
 - [ ] Terbitkan kebijakan privasi pada URL publik dan masukkan URL tersebut di Play Console.
 - [ ] Lengkapi Data safety berdasarkan perilaku APK final, bukan perkiraan.
 - [ ] Lengkapi content rating, target audience, app access, ads declaration, dan deklarasi izin.

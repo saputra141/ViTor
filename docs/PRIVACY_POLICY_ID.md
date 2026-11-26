@@ -26,4 +26,4 @@ ViTor bukan aplikasi yang dirancang khusus untuk anak-anak dan tidak secara seng
 Kebijakan ini dapat diperbarui jika fitur atau praktik pemrosesan data aplikasi berubah. Versi terbaru harus dipublikasikan pada URL kebijakan privasi yang dapat diakses publik sebelum pengiriman ke Google Play.
 
 ## Kontak
-Email dukungan dan privasi: **[MASUKKAN EMAIL KONTAK DEVELOPER YANG AKTIF]**
+Email dukungan dan privasi: **koinklub@gmail.com**

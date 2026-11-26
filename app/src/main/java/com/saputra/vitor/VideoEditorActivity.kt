@@ -589,6 +589,7 @@ private fun VideoEditorScreen() {
             )
         }
     }
+}
 
 private fun queryDisplayName(context: android.content.Context, uri: Uri): String? =
     runCatching {
@@ -613,5 +614,4 @@ private fun readDuration(context: android.content.Context, uri: Uri): Long {
 private fun formatTime(milliseconds: Long): String {
     val total = (milliseconds / 1000L).coerceAtLeast(0L)
     return "%02d:%02d".format(total / 60L, total % 60L)
-}
 }
