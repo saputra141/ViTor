@@ -6,17 +6,19 @@ ViTor adalah editor video native Android yang sedang dikembangkan dengan Kotlin,
 - Impor beberapa video melalui pemilih dokumen Android.
 - Pratinjau video.
 - Susun ulang dan hapus klip.
-- Potong rentang klip dan ekspor MP4.
+- Potong rentang setiap klip dan ekspor MP4; trim tiap klip disimpan dalam proyek.
 - Gabungkan klip sesuai urutan.
 - Tambahkan musik latar dan atur volumenya.
 - Tambahkan judul teks statis dan filter video.
 - Impor, edit teks, tambah, hapus, dan ekspor subtitle SRT.
+- Render subtitle bertiming ke video MP4.
 - Simpan dan buka data proyek lokal.
 
 ## Fitur yang masih perlu diselesaikan
 - Timeline multitrack visual dengan pengeditan independen untuk setiap track.
-- Trim dan split per klip yang tersimpan konsisten di proyek.
-- Subtitle bertiming yang dapat dibakar ke video.
+- Split klip non-destruktif dan transisi antar-klip.
+- Mesin speech-to-text offline untuk Auto Caption.
+- Mesin pengenalan lirik dan penyelarasan kata untuk Auto Lyrics.
 - Transisi, keyframe, animasi teks, dan efek per-klip.
 - Mesin speech-to-text offline untuk Auto Caption.
 - Mesin pengenalan lirik dan penyelarasan kata untuk Auto Lyrics.

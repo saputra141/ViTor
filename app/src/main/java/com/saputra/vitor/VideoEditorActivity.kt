@@ -546,7 +546,7 @@ private fun VideoEditorScreen() {
             }
 
             Text(status, color = Color(0xFFBDB8FF), fontSize = 11.sp)
-            Text("ViTor 0.6.0 • Video, musik, teks, filter, trim, dan render", color = Color(0xFF686A78), fontSize = 10.sp)
+            Text("ViTor 0.7.0 • Video, musik, teks, filter, trim, dan render", color = Color(0xFF686A78), fontSize = 10.sp)
         }
         if (showProjectDialog) {
             AlertDialog(
