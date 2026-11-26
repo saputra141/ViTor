@@ -68,7 +68,8 @@ fun exportEditedProject(
     titleText: String,
     look: VideoLook,
     onComplete: (String?) -> Unit,
-    onFailure: (String) -> Unit
+    onFailure: (String) -> Unit,
+    clipRanges: List<Pair<Long, Long>>? = null
 ) {
     require(clipUris.isNotEmpty()) { "Tambahkan minimal satu klip video." }
     require(musicVolume in 0f..1f) { "Volume musik harus antara 0 dan 100%." }
@@ -96,8 +97,26 @@ fun exportEditedProject(
         }
     }
 
-    val videoItems = clipUris.map { uri ->
-        EditedMediaItem.Builder(MediaItem.fromUri(uri))
+    require(clipRanges == null || clipRanges.size == clipUris.size) {
+        "Jumlah rentang trim harus sama dengan jumlah klip."
+    }
+    val videoItems = clipUris.mapIndexed { index, uri ->
+        val range = clipRanges?.get(index)
+        val mediaItem = if (range == null) {
+            MediaItem.fromUri(uri)
+        } else {
+            require(range.first >= 0L && range.second > range.first) { "Rentang trim klip tidak valid." }
+            MediaItem.Builder()
+                .setUri(uri)
+                .setClippingConfiguration(
+                    MediaItem.ClippingConfiguration.Builder()
+                        .setStartPositionMs(range.first)
+                        .setEndPositionMs(range.second)
+                        .build()
+                )
+                .build()
+        }
+        EditedMediaItem.Builder(mediaItem)
             .setEffects(Effects(emptyList(), overlayEffects))
             .build()
     }

@@ -74,7 +74,14 @@ import com.saputra.vitor.timeline.VideoClip
 import java.io.File
 import java.util.UUID
 
-private data class EditClip(val id: String, val uri: Uri, val name: String, val durationMs: Long)
+private data class EditClip(
+    val id: String,
+    val uri: Uri,
+    val name: String,
+    val durationMs: Long,
+    val trimStartMs: Long = 0L,
+    val trimEndMs: Long = durationMs
+)
 
 class VideoEditorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,7 +164,7 @@ private fun VideoEditorScreen() {
                 }
             }.getOrNull() ?: "Video ${clips.size + 1}"
             val duration = readDuration(context, uri)
-            val clip = EditClip(UUID.randomUUID().toString(), uri, name, duration)
+            val clip = EditClip(UUID.randomUUID().toString(), uri, name, duration, 0L, duration.coerceAtLeast(1L))
             clips.add(clip)
             selected = clip
             trimRange = 0f..duration.coerceAtLeast(1L).toFloat()
@@ -179,12 +186,12 @@ private fun VideoEditorScreen() {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
-    LaunchedEffect(selected?.uri) {
+    LaunchedEffect(selected?.id) {
         selected?.let {
             player.setMediaItem(MediaItem.fromUri(it.uri))
             player.prepare()
             player.playWhenReady = false
-            trimRange = 0f..it.durationMs.coerceAtLeast(1L).toFloat()
+            trimRange = it.trimStartMs.toFloat()..it.trimEndMs.coerceAtLeast(1L).toFloat()
         } ?: player.clearMediaItems()
     }
     DisposableEffect(Unit) { onDispose { player.release() } }
@@ -210,17 +217,13 @@ private fun VideoEditorScreen() {
                     OutlinedButton(onClick = {
                         runCatching {
                             val duration = clips.sumOf { it.durationMs.coerceAtLeast(1L) }
-                            val current = selected
                             val videoTracks = clips.map { clip ->
-                                val isSelected = clip.id == current?.id
-                                val start = if (isSelected) trimRange.start.toLong().coerceIn(0L, (clip.durationMs - 1L).coerceAtLeast(0L)) else 0L
-                                val end = if (isSelected) trimRange.endInclusive.toLong().coerceIn(start + 1L, clip.durationMs.coerceAtLeast(start + 1L)) else clip.durationMs.coerceAtLeast(1L)
                                 VideoClip(
                                     id = clip.id,
                                     sourceUri = clip.uri.toString(),
                                     sourceDurationMs = clip.durationMs.coerceAtLeast(1L),
-                                    trimStartMs = start,
-                                    trimEndMs = end
+                                    trimStartMs = clip.trimStartMs.coerceIn(0L, (clip.durationMs - 1L).coerceAtLeast(0L)),
+                                    trimEndMs = clip.trimEndMs.coerceIn(clip.trimStartMs + 1L, clip.durationMs.coerceAtLeast(clip.trimStartMs + 1L))
                                 )
                             }
                             val audioTracks = musicUri?.let { uri ->
@@ -353,6 +356,7 @@ private fun VideoEditorScreen() {
                             musicVolume = musicVolume,
                             titleText = titleText,
                             look = selectedLook,
+                            clipRanges = clips.map { it.trimStartMs to it.trimEndMs },
                             onComplete = {
                                 exporting = false
                                 status = "Render selesai. File MP4 disimpan ke Movies/ViTor."
@@ -496,7 +500,20 @@ private fun VideoEditorScreen() {
                         )
                         RangeSlider(
                             value = trimRange,
-                            onValueChange = { trimRange = it },
+                            onValueChange = { range ->
+                                trimRange = range
+                                selected?.let { current ->
+                                    val index = clips.indexOfFirst { it.id == current.id }
+                                    if (index >= 0) {
+                                        val updated = current.copy(
+                                            trimStartMs = range.start.toLong().coerceAtLeast(0L),
+                                            trimEndMs = range.endInclusive.toLong().coerceAtLeast(range.start.toLong() + 1L)
+                                        )
+                                        clips[index] = updated
+                                        selected = updated
+                                    }
+                                }
+                            },
                             valueRange = 0f..selected!!.durationMs.toFloat(),
                             steps = 0
                         )
@@ -551,7 +568,10 @@ private fun VideoEditorScreen() {
                                             project.videoClips.forEach { saved ->
                                                 val uri = Uri.parse(saved.sourceUri)
                                                 val name = queryDisplayName(context, uri) ?: "Video ${clips.size + 1}"
-                                                clips.add(EditClip(saved.id, uri, name, saved.sourceDurationMs))
+                                                clips.add(EditClip(
+                                                    saved.id, uri, name, saved.sourceDurationMs,
+                                                    saved.trimStartMs, saved.trimEndMs
+                                                ))
                                             }
                                             selected = clips.firstOrNull()
                                             selected?.let { clip ->
