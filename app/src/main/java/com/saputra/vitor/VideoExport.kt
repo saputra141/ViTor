@@ -10,6 +10,8 @@ import android.provider.MediaStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
@@ -27,11 +29,7 @@ fun exportTrimmedClip(
     onFailure: (String) -> Unit
 ) {
     require(startMs >= 0L && endMs > startMs) { "Rentang potong tidak valid." }
-    val outputDirectory = File(
-        context.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: context.filesDir,
-        "ViTor"
-    ).apply { mkdirs() }
-    val outputFile = File(outputDirectory, "ViTor_${System.currentTimeMillis()}.mp4")
+    val outputFile = createOutputFile(context)
 
     val clippedItem = MediaItem.Builder()
         .setUri(uri)
@@ -43,6 +41,54 @@ fun exportTrimmedClip(
         )
         .build()
 
+    startExport(
+        context = context,
+        outputFile = outputFile,
+        onComplete = onComplete,
+        onFailure = onFailure
+    ) { transformer ->
+        transformer.start(clippedItem, outputFile.absolutePath)
+    }
+}
+
+/**
+ * Concatenates clips in the exact order supplied by the editor timeline.
+ * Media3 transcodes incompatible inputs as needed; unsupported codec/track
+ * combinations are reported through onFailure instead of silently dropping clips.
+ */
+@UnstableApi
+fun exportMergedClips(
+    context: Context,
+    clipUris: List<Uri>,
+    onComplete: (String?) -> Unit,
+    onFailure: (String) -> Unit
+) {
+    require(clipUris.size >= 2) { "Pilih minimal dua klip untuk digabung." }
+    val outputFile = createOutputFile(context)
+    val editedItems = clipUris.map { uri ->
+        EditedMediaItem.Builder(MediaItem.fromUri(uri)).build()
+    }
+    val videoSequence = EditedMediaItemSequence.withAudioAndVideoFrom(editedItems)
+    val composition = Composition.Builder(videoSequence).build()
+
+    startExport(
+        context = context,
+        outputFile = outputFile,
+        onComplete = onComplete,
+        onFailure = onFailure
+    ) { transformer ->
+        transformer.start(composition, outputFile.absolutePath)
+    }
+}
+
+@UnstableApi
+private fun startExport(
+    context: Context,
+    outputFile: File,
+    onComplete: (String?) -> Unit,
+    onFailure: (String) -> Unit,
+    start: (Transformer) -> Unit
+) {
     val listener = object : Transformer.Listener {
         override fun onCompleted(composition: Composition, exportResult: ExportResult) {
             val galleryUri = publishToGallery(context, outputFile)
@@ -60,14 +106,22 @@ fun exportTrimmedClip(
     }
 
     try {
-        Transformer.Builder(context)
+        val transformer = Transformer.Builder(context)
             .addListener(listener)
             .build()
-            .start(clippedItem, outputFile.absolutePath)
+        start(transformer)
     } catch (error: Exception) {
         outputFile.delete()
         onFailure(error.message ?: "Tidak dapat memulai proses ekspor.")
     }
+}
+
+private fun createOutputFile(context: Context): File {
+    val outputDirectory = File(
+        context.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: context.filesDir,
+        "ViTor"
+    ).apply { mkdirs() }
+    return File(outputDirectory, "ViTor_${System.currentTimeMillis()}.mp4")
 }
 
 private fun publishToGallery(context: Context, source: File): Uri? {
