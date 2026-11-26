@@ -38,6 +38,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.TextField
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -87,6 +90,10 @@ private fun VideoEditorScreen() {
     var trimRange by remember { mutableStateOf(0f..1f) }
     var exporting by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("Import video untuk mulai mengedit.") }
+    var musicUri by remember { mutableStateOf<Uri?>(null) }
+    var titleText by remember { mutableStateOf("") }
+    var musicVolume by remember { mutableStateOf(0.75f) }
+    var selectedLook by remember { mutableStateOf(VideoLook.ORIGINAL) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -107,6 +114,18 @@ private fun VideoEditorScreen() {
             selected = clip
             trimRange = 0f..duration.coerceAtLeast(1L).toFloat()
             status = if (duration > 0) "Klip siap diedit." else "Durasi video tidak dapat dibaca."
+        }
+    }
+
+    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+            musicUri = uri
+            status = "Musik latar ditambahkan ke proyek."
         }
     }
 
@@ -227,24 +246,86 @@ private fun VideoEditorScreen() {
                 Button(
                     onClick = {
                         exporting = true
-                        status = "Menggabungkan ${clips.size} klip menjadi satu MP4..."
-                        exportMergedClips(
+                        status = "Merender video, audio, teks, dan efek..."
+                        exportEditedProject(
                             context = context,
                             clipUris = clips.map { it.uri },
+                            musicUri = musicUri,
+                            musicVolume = musicVolume,
+                            titleText = titleText,
+                            look = selectedLook,
                             onComplete = {
                                 exporting = false
-                                status = "Video gabungan selesai. Periksa folder Movies/ViTor."
+                                status = "Render selesai. File MP4 disimpan ke Movies/ViTor."
                             },
                             onFailure = { error ->
                                 exporting = false
-                                status = "Penggabungan gagal: $error"
+                                status = "Render gagal: $error"
                             }
                         )
                     },
-                    enabled = clips.size >= 2 && !exporting,
+                    enabled = clips.isNotEmpty() && !exporting,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (exporting) "Sedang merender..." else "Gabung & Ekspor Semua Klip")
+                    Text(if (exporting) "Sedang merender..." else "Render Proyek MP4")
+                }
+            }
+
+            Card(
+                Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1B23))
+            ) {
+                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("LAYER AUDIO", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text(
+                        if (musicUri == null) "Belum ada musik latar" else "Musik latar siap dirender",
+                        color = Color(0xFFBDB8FF), fontSize = 11.sp
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { audioPicker.launch(arrayOf("audio/*")) }, enabled = !exporting) {
+                            Text(if (musicUri == null) "Tambah Musik" else "Ganti Musik")
+                        }
+                        if (musicUri != null) {
+                            OutlinedButton(onClick = { musicUri = null }, enabled = !exporting) {
+                                Text("Hapus Musik")
+                            }
+                        }
+                    }
+                    Text("Volume musik: ${(musicVolume * 100).toInt()}%", color = Color(0xFFAAAAB8), fontSize = 11.sp)
+                    Slider(value = musicVolume, onValueChange = { musicVolume = it }, valueRange = 0f..1f, enabled = musicUri != null && !exporting)
+                }
+            }
+
+            Card(
+                Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1B23))
+            ) {
+                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("TEKS & FILTER VIDEO", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    TextField(
+                        value = titleText,
+                        onValueChange = { titleText = it.take(120) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Teks overlay pada video") },
+                        placeholder = { Text("Tulis judul atau caption...") },
+                        singleLine = true,
+                        enabled = !exporting
+                    )
+                    Text("Filter", color = Color(0xFFAAAAB8), fontSize = 11.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        OutlinedButton(onClick = { selectedLook = VideoLook.ORIGINAL }, enabled = !exporting) {
+                            Text(if (selectedLook == VideoLook.ORIGINAL) "✓ Asli" else "Asli")
+                        }
+                        OutlinedButton(onClick = { selectedLook = VideoLook.GRAYSCALE }, enabled = !exporting) {
+                            Text(if (selectedLook == VideoLook.GRAYSCALE) "✓ Hitam putih" else "Hitam putih")
+                        }
+                        OutlinedButton(onClick = { selectedLook = VideoLook.HIGH_CONTRAST }, enabled = !exporting) {
+                            Text(if (selectedLook == VideoLook.HIGH_CONTRAST) "✓ Kontras" else "Kontras")
+                        }
+                    }
+                    Text("Teks dan filter diterapkan saat render ke seluruh klip proyek.", color = Color(0xFF9292A0), fontSize = 10.sp)
                 }
             }
 
@@ -294,7 +375,7 @@ private fun VideoEditorScreen() {
             }
 
             Text(status, color = Color(0xFFBDB8FF), fontSize = 11.sp)
-            Text("ViTor 0.5.0 • Trim, susun ulang, gabung, dan ekspor MP4", color = Color(0xFF686A78), fontSize = 10.sp)
+            Text("ViTor 0.6.0 • Video, musik, teks, filter, trim, dan render", color = Color(0xFF686A78), fontSize = 10.sp)
         }
     }
 }
