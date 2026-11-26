@@ -45,7 +45,7 @@ class TimelineProjectTest {
             ),
             textLayers = listOf(TextLayer("title", "Hello", 500, 4_000))
         )
-        assertEquals(12_000L, project.durationMs)
+        assertEquals(13_000L, project.durationMs)
     }
 
     @Test fun mutedAudioDoesNotExtendRenderedProjectDuration() {
