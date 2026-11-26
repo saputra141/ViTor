@@ -1,6 +1,7 @@
 package com.saputra.vitor
 
 import android.content.ContentValues
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
@@ -26,7 +27,7 @@ import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
-import androidx.media3.effect.CanvasOverlay
+import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.Contrast
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.OverlaySettings
@@ -262,43 +263,53 @@ private fun publishToGallery(context: Context, source: File): Uri? {
 private class TimedSubtitleOverlay(
     private val cues: List<SubtitleCue>,
     private val timelineOffsetMs: Long
-) : CanvasOverlay(true) {
-    private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = AndroidColor.WHITE
-        typeface = Typeface.create("sans-serif", Typeface.BOLD)
-        textAlign = Paint.Align.CENTER
-    }
-    private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = AndroidColor.argb(170, 0, 0, 0)
-        style = Paint.Style.FILL
+) : BitmapOverlay() {
+    private val frameWidth = 1280
+    private val frameHeight = 720
+    private val emptyBitmap = Bitmap.createBitmap(frameWidth, frameHeight, Bitmap.Config.ARGB_8888)
+    private val bitmapCache = mutableMapOf<String, Bitmap>()
+
+    override fun getBitmap(presentationTimeUs: Long): Bitmap {
+        val timelineMs = timelineOffsetMs + presentationTimeUs / 1_000L
+        val cue = cues.firstOrNull { timelineMs >= it.startMs && timelineMs < it.endMs } ?: return emptyBitmap
+        return bitmapCache.getOrPut(cue.id) { createCueBitmap(cue) }
     }
 
-    override fun onDraw(canvas: Canvas, presentationTimeUs: Long) {
-        val timelineMs = timelineOffsetMs + presentationTimeUs / 1_000L
-        val cue = cues.firstOrNull { timelineMs >= it.startMs && timelineMs < it.endMs } ?: return
-        textPaint.textSize = (canvas.width * 0.045f).coerceIn(28f, 64f)
-        val maxTextWidth = (canvas.width * 0.88f).toInt().coerceAtLeast(1)
+    private fun createCueBitmap(cue: SubtitleCue): Bitmap {
+        val bitmap = Bitmap.createBitmap(frameWidth, frameHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = AndroidColor.WHITE
+            typeface = Typeface.create("sans-serif", Typeface.BOLD)
+            textSize = 42f
+            textAlign = Paint.Align.CENTER
+        }
         val layout = StaticLayout.Builder.obtain(
-            cue.text, 0, cue.text.length, textPaint, maxTextWidth
+            cue.text, 0, cue.text.length, textPaint, (frameWidth * 0.88f).toInt()
         ).setAlignment(Layout.Alignment.ALIGN_CENTER)
             .setIncludePad(false)
             .build()
-        val horizontalPadding = canvas.width * 0.035f
-        val verticalPadding = textPaint.textSize * 0.35f
-        val left = (canvas.width - layout.width) / 2f - horizontalPadding
-        val top = canvas.height * 0.80f - verticalPadding
+        val horizontalPadding = 42f
+        val verticalPadding = 18f
+        val left = (frameWidth - layout.width) / 2f - horizontalPadding
+        val top = frameHeight * 0.80f - verticalPadding
         val right = left + layout.width + horizontalPadding * 2f
         val bottom = top + layout.height + verticalPadding * 2f
-        canvas.drawRoundRect(RectF(left, top, right, bottom), 16f, 16f, backgroundPaint)
+        val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = AndroidColor.argb(175, 0, 0, 0)
+            style = Paint.Style.FILL
+        }
+        canvas.drawRoundRect(RectF(left, top, right, bottom), 18f, 18f, backgroundPaint)
         canvas.save()
-        canvas.translate((canvas.width - layout.width) / 2f, top + verticalPadding)
+        canvas.translate((frameWidth - layout.width) / 2f, top + verticalPadding)
         layout.draw(canvas)
         canvas.restore()
+        return bitmap
     }
 
     override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings =
         OverlaySettings.Builder()
-            .setBackgroundFrameAnchor(0f, -0.78f)
+            .setBackgroundFrameAnchor(0f, 0f)
             .setOverlayFrameAnchor(0f, 0f)
             .build()
 }
