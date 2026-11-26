@@ -1,0 +1,1931 @@
+{
+  "v": 1,
+  "terbit": 1795332345,
+  "item": [
+    {
+      "id": "preset-murotal-ayat-putih",
+      "kategori": "preset",
+      "nama": "Ayat Putih",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-murotal-ayat-putih-v1-thumb.png",
+        "sha256": "0c567c151cd0fd181120c6b6895e8e95fdb551fd86364bc868ced5868b6245ed",
+        "size": 131959
+      },
+      "file": [
+        {
+          "nama": "OpenSans-Bold.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-murotal-ayat-putih-v1-OpenSans-Bold.woff2",
+          "sha256": "114f872abf6cae70383b09ca2168821991fde718702d79cdc457a49b03560cb0",
+          "size": 18260
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-murotal-ayat-putih-v1-preset.json",
+          "sha256": "12f05903ffc376c052f889053975262c8a8f998887ae91472ac84d51570302a5",
+          "size": 929
+        }
+      ]
+    },
+    {
+      "id": "partikel-malaikat-kecil",
+      "kategori": "partikel",
+      "nama": "Malaikat kecil",
+      "premium": false,
+      "versi": 1,
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-malaikat-kecil-v1-thumb.png",
+        "sha256": "b33666071444c9db00ab770d461e3b2f2e0076d363154b522f052342ff6b46aa",
+        "size": 43702
+      },
+      "file": [
+        {
+          "nama": "malaikat.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-malaikat-kecil-v1-malaikat.png",
+          "sha256": "25c885f6e0baf2fbf4c9141a9064baec5b6b4a1d3f64648effa787d352d534d3",
+          "size": 30666
+        },
+        {
+          "nama": "partikel.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-malaikat-kecil-v1-partikel.json",
+          "sha256": "a03ff13d299488f71b5ae1b7aba25188c6be1cb8b78aa2e73aa027b3a14553e6",
+          "size": 1567
+        }
+      ]
+    },
+    {
+      "id": "partikel-bintang-gantung",
+      "kategori": "partikel",
+      "nama": "Bintang gantung",
+      "premium": false,
+      "versi": 1,
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-bintang-gantung-v1-thumb.png",
+        "sha256": "4214f800b32fea646bd2b6712afaf6e702d820e0c058c76e52fe8f55b604af38",
+        "size": 52107
+      },
+      "file": [
+        {
+          "nama": "bintang.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-bintang-gantung-v1-bintang.png",
+          "sha256": "8bc916ebad89609b44a3e0e7ba2eecf5d396938944e6e66d8b3a33494414d9ae",
+          "size": 46715
+        },
+        {
+          "nama": "partikel.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-bintang-gantung-v1-partikel.json",
+          "sha256": "17bc4c0256ec338f2293a59792f038a6ba61a9dc6a5015a42cbb844b0b50aca2",
+          "size": 1397
+        }
+      ]
+    },
+    {
+      "id": "preset-kubah-mihrab",
+      "kategori": "preset",
+      "nama": "Kubah Mihrab",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kubah-mihrab-v1-thumb.png",
+        "sha256": "edff15d757d10ae654b196d1e0b2f0bb2dbc136b0939f8aac3c80f317778c14b",
+        "size": 27146
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kubah-mihrab-v1-dekor.png",
+          "sha256": "a738a3357afd0728f9634fb9ec6c0086c9303afa74d6b9da34fd74aa5bd3116b",
+          "size": 86683
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kubah-mihrab-v1-preset.json",
+          "sha256": "17e87cefb2fcd5ce2e49ca3010095cfb3851c463d23f3514d952681874787a29",
+          "size": 3751
+        }
+      ]
+    },
+    {
+      "id": "preset-kupu-taman",
+      "kategori": "preset",
+      "nama": "Kupu Taman",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kupu-taman-v1-thumb.png",
+        "sha256": "2d4c5c303df4f4c7622154aac25a424e6c69d7461cb59d59394b2bcb768dd073",
+        "size": 22737
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kupu-taman-v1-dekor.png",
+          "sha256": "4e1d8b3813741fc0aacd83f50c88c82592350638e873554477ae2e0d0bfdc4e4",
+          "size": 28805
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kupu-taman-v1-preset.json",
+          "sha256": "7e8eedbceaf5033c29101a9c426741dcfbfc67acd810772db541eed341dff357",
+          "size": 8211
+        }
+      ]
+    },
+    {
+      "id": "preset-bulan-sabit",
+      "kategori": "preset",
+      "nama": "Bulan Sabit",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bulan-sabit-v1-thumb.png",
+        "sha256": "22e5c7e278e1411c7f6cadddc719c4189ef6e4dbf41542cf6020ababae209b14",
+        "size": 23310
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bulan-sabit-v1-dekor.png",
+          "sha256": "19bd5d750009776c78a33a0c8f4c5ef6b71e19ad2f345b4db503c357a3df5e4f",
+          "size": 19935
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bulan-sabit-v1-preset.json",
+          "sha256": "43c44ffbad81d1256e9f2097369fc676f1e6bca11f1b551ad1f4e3b212423812",
+          "size": 8605
+        }
+      ]
+    },
+    {
+      "id": "preset-geometri-putar",
+      "kategori": "preset",
+      "nama": "Geometri Putar",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-geometri-putar-v1-thumb.png",
+        "sha256": "d410a506b709c84eca4e45d2dd01b65680356f70258a900d646635377fd36729",
+        "size": 24747
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-geometri-putar-v1-dekor.png",
+          "sha256": "6deeeaf5dca1001bb9868f05a735dc674e54efbffb2c439ac62f65ecb8c4708c",
+          "size": 28751
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-geometri-putar-v1-preset.json",
+          "sha256": "5ae846f2a360ffb3fe992a12642ace507525ca1760d5b94c34ea8dff36b0a438",
+          "size": 6973
+        }
+      ]
+    },
+    {
+      "id": "preset-kunang-kunang",
+      "kategori": "preset",
+      "nama": "Kunang-kunang",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kunang-kunang-v1-thumb.png",
+        "sha256": "81b68afd82c569e16ff7b834dcc3c900a48fa8ebb1d79b88cc2fa82a16767fc0",
+        "size": 23636
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kunang-kunang-v1-dekor.png",
+          "sha256": "64061871243b6d3c7dfdf37743c250121da0c1737b1ea2ec477ee6233ceba1f1",
+          "size": 4091
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kunang-kunang-v1-preset.json",
+          "sha256": "d6461f12dcc5c6e6514d118521a181578088db6bd117e280542110a2be0a7187",
+          "size": 16894
+        }
+      ]
+    },
+    {
+      "id": "preset-tasbih-ayat",
+      "kategori": "preset",
+      "nama": "Tasbih Ayat",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-tasbih-ayat-v1-thumb.png",
+        "sha256": "089925f50462457e414dc08aef152020c883c808e9d672221b4d8c095652d7ed",
+        "size": 25343
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-tasbih-ayat-v1-dekor.png",
+          "sha256": "eba62b4006e36331c19fba5c1df50876f1bf523d2533c8060cc614dc4efcaf72",
+          "size": 7269
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-tasbih-ayat-v1-preset.json",
+          "sha256": "c35c9f6cd95f50933b8c15a7730292d5f357929ee8859d0ef333ae59724dfcc1",
+          "size": 23947
+        }
+      ]
+    },
+    {
+      "id": "preset-bingkai-kata",
+      "kategori": "preset",
+      "nama": "Bingkai Kata",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bingkai-kata-v1-thumb.png",
+        "sha256": "1b8ef4c1cd9a74924cdb41f406e04ecc5cb4361f2883040f0791a0a6ef0ca960",
+        "size": 21099
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bingkai-kata-v1-dekor.png",
+          "sha256": "b52c0e86d3a608991cf4e7ebdda6f2b071ec46a6ca667acf8b16ec7e7b4fb739",
+          "size": 1141
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bingkai-kata-v1-preset.json",
+          "sha256": "ebb2c13a3592fbe92fa0813a9603b1cb7e767ff44911b6159f567fe0ed29634c",
+          "size": 6062
+        }
+      ]
+    },
+    {
+      "id": "preset-sulur-emas",
+      "kategori": "preset",
+      "nama": "Sulur Emas",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-sulur-emas-v1-thumb.png",
+        "sha256": "630d522bee69babe25ac931691ccfa9cb0548cd44cc9f6ab90ce076188ec7e89",
+        "size": 28673
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-sulur-emas-v1-dekor.png",
+          "sha256": "710d26ffb0b9691f9bec25bd1568c65452d41a1382d9253448d2252312cf43cf",
+          "size": 57747
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-sulur-emas-v1-preset.json",
+          "sha256": "7fe07126228a335b202faa8d46ae6e65dc35e4ef7a59877679247855ab13b9fe",
+          "size": 6387
+        }
+      ]
+    },
+    {
+      "id": "preset-kelopak-mawar",
+      "kategori": "preset",
+      "nama": "Kelopak Mawar",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kelopak-mawar-v1-thumb.png",
+        "sha256": "2f5b502d8825ac32a4c4ed618c918e663cf4230d8dad90ec55d8150ca757c29e",
+        "size": 21520
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kelopak-mawar-v1-dekor.png",
+          "sha256": "9efbd0ecd0487c24b06c71779feaef98621dfb9dac02d7ced42f7054b28627aa",
+          "size": 366
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kelopak-mawar-v1-preset.json",
+          "sha256": "29fefa47def4e1377cc2e3fc30d9fc1c87f95f3faee88e5a8a7300a17b683c9e",
+          "size": 14818
+        }
+      ]
+    },
+    {
+      "id": "preset-hujan-nur",
+      "kategori": "preset",
+      "nama": "Hujan Nur",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-hujan-nur-v1-thumb.png",
+        "sha256": "1e785220684aa99da8d479ec5f6d3fc9c57ffbfc707c9cb6400332ac11a293b2",
+        "size": 22932
+      },
+      "file": [
+        {
+          "nama": "dekor.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-hujan-nur-v1-dekor.png",
+          "sha256": "afb87e31bcd2a0f65009a8a9005cdf851714145be999135ea7161265a56003ae",
+          "size": 6392
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-hujan-nur-v1-preset.json",
+          "sha256": "ce092bdf2371d5cc302f27901316c76c69abd8d997f71bd95b3d9f5b10e850c6",
+          "size": 16511
+        }
+      ]
+    },
+    {
+      "id": "filter-bleach-bypass",
+      "kategori": "efek",
+      "nama": "Bleach Bypass",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-bleach-bypass-v1-thumb.png",
+        "sha256": "95fe55d4db7977abd884ff13b55b9e540f52b85957f841a5b667d7966633e74a",
+        "size": 11350
+      },
+      "file": [
+        {
+          "nama": "bleach-bypass.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-bleach-bypass-v1-bleach-bypass.gbfx",
+          "sha256": "ef783aaccc7b4d228916dd19c8d13ad85570e4aced657d47bec26255f430f16e",
+          "size": 356
+        }
+      ]
+    },
+    {
+      "id": "filter-cahaya-lilin",
+      "kategori": "efek",
+      "nama": "Cahaya Lilin",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cahaya-lilin-v1-thumb.png",
+        "sha256": "ded3c956817b19ae89b33ef48b5e01a629db37f95d4d1fa871e2fa1322e2b9fb",
+        "size": 10891
+      },
+      "file": [
+        {
+          "nama": "cahaya-lilin.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cahaya-lilin-v1-cahaya-lilin.gbfx",
+          "sha256": "e059ea12f8ca61e7447591783f8379af43682655473fd07c9ebd5b4cf8865cd7",
+          "size": 351
+        }
+      ]
+    },
+    {
+      "id": "filter-cerah",
+      "kategori": "efek",
+      "nama": "Cerah",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cerah-v1-thumb.png",
+        "sha256": "1376efe37a22ec1ce3a1e89a4f368880af575b083cc3487f81291fee4316acef",
+        "size": 11787
+      },
+      "file": [
+        {
+          "nama": "cerah.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cerah-v1-cerah.gbfx",
+          "sha256": "94b3eb7ed9df154cad942992d9b37fa2acd3a749565f666a958e1ec7cb1c4e03",
+          "size": 343
+        }
+      ]
+    },
+    {
+      "id": "filter-cokelat-hangat",
+      "kategori": "efek",
+      "nama": "Cokelat Hangat",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cokelat-hangat-v1-thumb.png",
+        "sha256": "df52e18f7cf1f4a4a8a055bcabfd0a3b116f94a128b7a6cdc6a91674d60f035e",
+        "size": 11442
+      },
+      "file": [
+        {
+          "nama": "cokelat-hangat.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cokelat-hangat-v1-cokelat-hangat.gbfx",
+          "sha256": "f51d2abec08da457999edf2ff6c200a42313266f0d54ce9c981302d83eaf25f8",
+          "size": 364
+        }
+      ]
+    },
+    {
+      "id": "filter-cross-proses",
+      "kategori": "efek",
+      "nama": "Cross Proses",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cross-proses-v1-thumb.png",
+        "sha256": "959bdbb5818f0d98c5f8cb95ef01ec8150430d12c42736ee990aac32791f5c81",
+        "size": 11322
+      },
+      "file": [
+        {
+          "nama": "cross-proses.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-cross-proses-v1-cross-proses.gbfx",
+          "sha256": "d5037ba840e1cdc72fb8ff6191fd84209451c57d906c44af6534375626a7b24f",
+          "size": 327
+        }
+      ]
+    },
+    {
+      "id": "filter-dingin-pudar",
+      "kategori": "efek",
+      "nama": "Dingin Pudar",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-dingin-pudar-v1-thumb.png",
+        "sha256": "74b7bb88f080706961d3ea736ad88b49718868f5710817cebf4ac347a3eb7611",
+        "size": 11057
+      },
+      "file": [
+        {
+          "nama": "dingin-pudar.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-dingin-pudar-v1-dingin-pudar.gbfx",
+          "sha256": "32a884498f19c5658da6df0d84bfdda56919cbac28cfccbefc8f66e6f5d30aab",
+          "size": 326
+        }
+      ]
+    },
+    {
+      "id": "filter-emas-hijau",
+      "kategori": "efek",
+      "nama": "Emas Hijau",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-emas-hijau-v1-thumb.png",
+        "sha256": "a375e5f6b532a397cf63f4e7909c3ad3464020925c1619ea9f6139831caef6db",
+        "size": 11690
+      },
+      "file": [
+        {
+          "nama": "emas-hijau.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-emas-hijau-v1-emas-hijau.gbfx",
+          "sha256": "0970b495ea19c065b3b95b25e961ea2b24bc376df2957387a667c06777e96c8e",
+          "size": 362
+        }
+      ]
+    },
+    {
+      "id": "filter-emas-tua",
+      "kategori": "efek",
+      "nama": "Emas Tua",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-emas-tua-v1-thumb.png",
+        "sha256": "a03543ba6ec4785eba72c94409a1bba84084b3634b71e9f168f3d802feac2cf5",
+        "size": 9653
+      },
+      "file": [
+        {
+          "nama": "emas-tua.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-emas-tua-v1-emas-tua.gbfx",
+          "sha256": "1e1caf8034156c29f10d1e3cb0285eafce31a3dea1d1d74029695c77afc70200",
+          "size": 341
+        }
+      ]
+    },
+    {
+      "id": "filter-fajar-lembut",
+      "kategori": "efek",
+      "nama": "Fajar Lembut",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-fajar-lembut-v1-thumb.png",
+        "sha256": "7ee7563f8ba38e41f490b87c6e7c9d67976b94abd148bd00427fc26f515871cf",
+        "size": 11057
+      },
+      "file": [
+        {
+          "nama": "fajar-lembut.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-fajar-lembut-v1-fajar-lembut.gbfx",
+          "sha256": "60f490658354e682d27f0aebd707bd6f38ed80e1c71b96d340b8a0e0fdbf58e6",
+          "size": 354
+        }
+      ]
+    },
+    {
+      "id": "filter-film-hangat",
+      "kategori": "efek",
+      "nama": "Film Hangat",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-hangat-v1-thumb.png",
+        "sha256": "2852bbe651cfefacd9e884045fe0fb4e47abcb2cf8cfef2b3d1c675af1b0aeed",
+        "size": 11739
+      },
+      "file": [
+        {
+          "nama": "film-hangat.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-hangat-v1-film-hangat.gbfx",
+          "sha256": "df9eebaa36d5d74b6400d3e485b91a70ec2093b515d73a32522446e0b685ba51",
+          "size": 360
+        }
+      ]
+    },
+    {
+      "id": "filter-film-hijau",
+      "kategori": "efek",
+      "nama": "Film Hijau",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-hijau-v1-thumb.png",
+        "sha256": "b4216d7e95fed528927da74c2dd9ed030963b65656e18c338f0bab6b9c9516da",
+        "size": 11520
+      },
+      "file": [
+        {
+          "nama": "film-hijau.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-hijau-v1-film-hijau.gbfx",
+          "sha256": "9129859998765f9935bb3a5b988e8c2d278ee4822e8b741a12426a7234ad3e4d",
+          "size": 349
+        }
+      ]
+    },
+    {
+      "id": "filter-film-klasik",
+      "kategori": "efek",
+      "nama": "Film Klasik",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-klasik-v1-thumb.png",
+        "sha256": "8e034b831d20ea22a97672a8466ee6782b08f6b59ce3fdc1b806bf897191e1ca",
+        "size": 11240
+      },
+      "file": [
+        {
+          "nama": "film-klasik.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-film-klasik-v1-film-klasik.gbfx",
+          "sha256": "10b9c07fa28f851e7c045cbcba85eb8b314a55f0b76ec693e7714247c4cd1002",
+          "size": 358
+        }
+      ]
+    },
+    {
+      "id": "filter-gurun",
+      "kategori": "efek",
+      "nama": "Gurun",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-gurun-v1-thumb.png",
+        "sha256": "df2c386f352e7d4536a438791dab8fce5c5d6d92c319d74376a5d76fa610c4b3",
+        "size": 11160
+      },
+      "file": [
+        {
+          "nama": "gurun.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-gurun-v1-gurun.gbfx",
+          "sha256": "811c4651dac076441e1ecea77644caf5ac47d888f3f347b7a3d6dd5202c058ca",
+          "size": 344
+        }
+      ]
+    },
+    {
+      "id": "filter-hangat-pudar",
+      "kategori": "efek",
+      "nama": "Hangat Pudar",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-hangat-pudar-v1-thumb.png",
+        "sha256": "1b612c9d82cd73e1ff670ec89770a09f31e6bb30b0672968ae4160794af17104",
+        "size": 11042
+      },
+      "file": [
+        {
+          "nama": "hangat-pudar.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-hangat-pudar-v1-hangat-pudar.gbfx",
+          "sha256": "ed25d52139c3da2ce9fff1986d92a785552d835afc9fac25920cc80952fe87ef",
+          "size": 326
+        }
+      ]
+    },
+    {
+      "id": "filter-hijau-daun",
+      "kategori": "efek",
+      "nama": "Hijau Daun",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-hijau-daun-v1-thumb.png",
+        "sha256": "4875c31adb18bd967633a6f90fdb195e88e79628a65fc234190f3c1a4f64ed2a",
+        "size": 11574
+      },
+      "file": [
+        {
+          "nama": "hijau-daun.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-hijau-daun-v1-hijau-daun.gbfx",
+          "sha256": "875c68cb501d6c700084399976f04a6715f145828204bd8446378096816910a0",
+          "size": 353
+        }
+      ]
+    },
+    {
+      "id": "filter-infra-merah",
+      "kategori": "efek",
+      "nama": "Infra Merah",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-infra-merah-v1-thumb.png",
+        "sha256": "f90c4feb071ab5d2f1ef978039c821253f01aedf8a0f7ae55ff0b2e98aeba125",
+        "size": 11398
+      },
+      "file": [
+        {
+          "nama": "infra-merah.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-infra-merah-v1-infra-merah.gbfx",
+          "sha256": "b44662b2627bcf7b76a31b3152cc7dc5f8ac77652caa391fbaa6e92ac403e08a",
+          "size": 322
+        }
+      ]
+    },
+    {
+      "id": "filter-kabut",
+      "kategori": "efek",
+      "nama": "Kabut",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kabut-v1-thumb.png",
+        "sha256": "461ec65ed81a63c4ffcad172df4f353016fdd658f44f6c32c28684f94127de1d",
+        "size": 9936
+      },
+      "file": [
+        {
+          "nama": "kabut.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kabut-v1-kabut.gbfx",
+          "sha256": "ed5f796e2e44432b46a156aff20fd4ae11d51d01703bfe2ef771d381aa02ff49",
+          "size": 340
+        }
+      ]
+    },
+    {
+      "id": "filter-kontras-tinggi",
+      "kategori": "efek",
+      "nama": "Kontras Tinggi",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kontras-tinggi-v1-thumb.png",
+        "sha256": "2b4cca2f7f643e7ae647ab11a76422aacc169bc9c2b4b6ebdc745b5279985542",
+        "size": 11588
+      },
+      "file": [
+        {
+          "nama": "kontras-tinggi.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kontras-tinggi-v1-kontras-tinggi.gbfx",
+          "sha256": "f1a071d19f2e51d461b149ff298a69bdc9ef700a1d6560ab5bd555a16fdd4113",
+          "size": 340
+        }
+      ]
+    },
+    {
+      "id": "filter-kopi",
+      "kategori": "efek",
+      "nama": "Kopi",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kopi-v1-thumb.png",
+        "sha256": "9ab3c914dfca12a0bbc6a09725387f13db10fdbb9c7b337e7db0c8053b1cef7e",
+        "size": 9713
+      },
+      "file": [
+        {
+          "nama": "kopi.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-kopi-v1-kopi.gbfx",
+          "sha256": "5bf0d3853704d41139baea56813e68c171be1e643624ab7604ccbd6804725419",
+          "size": 340
+        }
+      ]
+    },
+    {
+      "id": "filter-koran",
+      "kategori": "efek",
+      "nama": "Koran",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-koran-v1-thumb.png",
+        "sha256": "6f05e8673ae109919d047ecadebc279897da38e58d5bc9cfb3666ece34abb16e",
+        "size": 8345
+      },
+      "file": [
+        {
+          "nama": "koran.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-koran-v1-koran.gbfx",
+          "sha256": "09d9d6a1db5c3b3554f8465b6a18af4c465a6a9d4363615fbf517594536df482",
+          "size": 343
+        }
+      ]
+    },
+    {
+      "id": "filter-lampu-kota",
+      "kategori": "efek",
+      "nama": "Lampu Kota",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lampu-kota-v1-thumb.png",
+        "sha256": "a72bbd55d555541024c332fd4d9e5419b1faa6490f2139440453be4c22d2a421",
+        "size": 11075
+      },
+      "file": [
+        {
+          "nama": "lampu-kota.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lampu-kota-v1-lampu-kota.gbfx",
+          "sha256": "700b81780f74ec33e89b5913140a489ce2ae254dc1c24433c70b014740b67af6",
+          "size": 329
+        }
+      ]
+    },
+    {
+      "id": "filter-laut-dalam",
+      "kategori": "efek",
+      "nama": "Laut Dalam",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-laut-dalam-v1-thumb.png",
+        "sha256": "b3ee243dc8b60329a3fc084154af018d34b54b5d7f9dfb5fcf2b6f9a346408f7",
+        "size": 10959
+      },
+      "file": [
+        {
+          "nama": "laut-dalam.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-laut-dalam-v1-laut-dalam.gbfx",
+          "sha256": "d4ac6d1459392a422c947cd69509f7cb5b0fe798693b9deb16241cc215352440",
+          "size": 328
+        }
+      ]
+    },
+    {
+      "id": "filter-lembut",
+      "kategori": "efek",
+      "nama": "Lembut",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lembut-v1-thumb.png",
+        "sha256": "3f1315047dd03a103f883376f230eaf3159db814827a03a885cf4f71cfe8e570",
+        "size": 10893
+      },
+      "file": [
+        {
+          "nama": "lembut.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lembut-v1-lembut.gbfx",
+          "sha256": "33a04b2e7f8311b8bd214c3cc19a2f0427e0f92eb7430e0b62a8dbe04fedb67b",
+          "size": 343
+        }
+      ]
+    },
+    {
+      "id": "filter-lomo",
+      "kategori": "efek",
+      "nama": "Lomo",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lomo-v1-thumb.png",
+        "sha256": "27d30afff253b05acab57ea76bc9ac6524a33e7940611f8ff45f93b8fe7b43a1",
+        "size": 12000
+      },
+      "file": [
+        {
+          "nama": "lomo.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-lomo-v1-lomo.gbfx",
+          "sha256": "2317958ad668081ab124d2e0e40ae18d2d0ffb95ec73cd8b2285b455616fcbb3",
+          "size": 347
+        }
+      ]
+    },
+    {
+      "id": "filter-malam-biru",
+      "kategori": "efek",
+      "nama": "Malam Biru",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-malam-biru-v1-thumb.png",
+        "sha256": "4d378d752806247cc570f736ac1bd9c630bc21644aa299bf0e7c1625fdb26a2b",
+        "size": 11000
+      },
+      "file": [
+        {
+          "nama": "malam-biru.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-malam-biru-v1-malam-biru.gbfx",
+          "sha256": "7085cd64981b40673a8157889dd78fc3066c2a4d44713edda4a15cf5ed92e3c7",
+          "size": 353
+        }
+      ]
+    },
+    {
+      "id": "filter-matte",
+      "kategori": "efek",
+      "nama": "Matte",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-matte-v1-thumb.png",
+        "sha256": "0c88ddb8ac56cdc9ebc61aa36a280574e88f180aac52fd48723be94281b18f42",
+        "size": 10631
+      },
+      "file": [
+        {
+          "nama": "matte.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-matte-v1-matte.gbfx",
+          "sha256": "b6620f02e36e74cdb7d973d5abfa673ced58c122b49c8ad09edfce9e5a794af7",
+          "size": 343
+        }
+      ]
+    },
+    {
+      "id": "filter-merah-muda",
+      "kategori": "efek",
+      "nama": "Merah Muda",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-merah-muda-v1-thumb.png",
+        "sha256": "ed498f23f8009812acc5221ad7bbc674cc2878c8047aba23c070fbc86cf49517",
+        "size": 11178
+      },
+      "file": [
+        {
+          "nama": "merah-muda.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-merah-muda-v1-merah-muda.gbfx",
+          "sha256": "92b1f95506904c94c7ae9501428cde786314e45cf14a2e8cf4e3874160f22b79",
+          "size": 331
+        }
+      ]
+    },
+    {
+      "id": "filter-mono-biru",
+      "kategori": "efek",
+      "nama": "Mono Biru",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-biru-v1-thumb.png",
+        "sha256": "d8e653234a2ff9d16d256da5142dba552a934891f546cf9f33cd24a9dd92a863",
+        "size": 9933
+      },
+      "file": [
+        {
+          "nama": "mono-biru.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-biru-v1-mono-biru.gbfx",
+          "sha256": "dd6546ebca4e6dc0d6d652216768a667310a56db02766baf67f7eca5be5f2b71",
+          "size": 344
+        }
+      ]
+    },
+    {
+      "id": "filter-mono-hijau",
+      "kategori": "efek",
+      "nama": "Mono Hijau",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-hijau-v1-thumb.png",
+        "sha256": "79424fcdce5f31096ebe101a8134380662cf9cc67473aa6f801b236fbed8f854",
+        "size": 9405
+      },
+      "file": [
+        {
+          "nama": "mono-hijau.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-hijau-v1-mono-hijau.gbfx",
+          "sha256": "bb0b0e916c21f2e5b3ef17b5fa0774202a058124168e3a6d52ab4efacc443171",
+          "size": 346
+        }
+      ]
+    },
+    {
+      "id": "filter-mono-kontras",
+      "kategori": "efek",
+      "nama": "Mono Kontras",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-kontras-v1-thumb.png",
+        "sha256": "687cdaa2bfa591f9624cddb02ced791859d07ecb5f1b951181b9a0259678930f",
+        "size": 8536
+      },
+      "file": [
+        {
+          "nama": "mono-kontras.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-kontras-v1-mono-kontras.gbfx",
+          "sha256": "ebf271d3ed65a10569c96827c2a500bd8aa052165fc25cc7c74194ace6dda1cf",
+          "size": 357
+        }
+      ]
+    },
+    {
+      "id": "filter-mono-lembut",
+      "kategori": "efek",
+      "nama": "Mono Lembut",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-lembut-v1-thumb.png",
+        "sha256": "7096a7342e15b0d738de10826edb8b82f7ba44a49021c679aef58eb5454085e1",
+        "size": 7622
+      },
+      "file": [
+        {
+          "nama": "mono-lembut.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-lembut-v1-mono-lembut.gbfx",
+          "sha256": "665130c482f33192860e66985bdf1df5d9b630770f05471fbcf5e3ddbd9f5125",
+          "size": 358
+        }
+      ]
+    },
+    {
+      "id": "filter-mono-merah",
+      "kategori": "efek",
+      "nama": "Mono Merah",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-merah-v1-thumb.png",
+        "sha256": "6d64fc0135840f698aa94dc100100310b5745b54cfc0abb8bf1d86ce6fdddefc",
+        "size": 9741
+      },
+      "file": [
+        {
+          "nama": "mono-merah.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-mono-merah-v1-mono-merah.gbfx",
+          "sha256": "fe42fddc1e6d4bb3f2d10af4e06d795874e4e6bc56c38d7b89a9e1fc16ae1546",
+          "size": 347
+        }
+      ]
+    },
+    {
+      "id": "filter-musim-dingin",
+      "kategori": "efek",
+      "nama": "Musim Dingin",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-dingin-v1-thumb.png",
+        "sha256": "419a342d3fb9458201d4516b1121452fec27c010238799f4f3e63ee826b69715",
+        "size": 10980
+      },
+      "file": [
+        {
+          "nama": "musim-dingin.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-dingin-v1-musim-dingin.gbfx",
+          "sha256": "dffdfcf33cbd45b63d2a29ad2fcde212751712f913ac8de94ea005a87e8afc67",
+          "size": 354
+        }
+      ]
+    },
+    {
+      "id": "filter-musim-gugur",
+      "kategori": "efek",
+      "nama": "Musim Gugur",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-gugur-v1-thumb.png",
+        "sha256": "87939423660191494a3538ce2ad1f73f272799dd860346614fbfaf4ed3ef80d3",
+        "size": 11646
+      },
+      "file": [
+        {
+          "nama": "musim-gugur.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-gugur-v1-musim-gugur.gbfx",
+          "sha256": "74f8bff0905a319af7344d81d6623770d939e7e3b015129d9d2f81f3139aabc8",
+          "size": 355
+        }
+      ]
+    },
+    {
+      "id": "filter-musim-semi",
+      "kategori": "efek",
+      "nama": "Musim Semi",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-semi-v1-thumb.png",
+        "sha256": "c9f3fa9cf197e0fc1d6c6dfaefe5a3a47173451a5512f608df2ea547b67e98d5",
+        "size": 11642
+      },
+      "file": [
+        {
+          "nama": "musim-semi.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-musim-semi-v1-musim-semi.gbfx",
+          "sha256": "dabaac01092b443e0bca4b419b09cc6d5ae73a34112f312eb6ef02ac25d011dd",
+          "size": 354
+        }
+      ]
+    },
+    {
+      "id": "filter-negatif",
+      "kategori": "efek",
+      "nama": "Negatif",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-negatif-v1-thumb.png",
+        "sha256": "f84cf0195297f328cbe57b6de965aa7226d662041cb418e9002ab6d2e94d4e6a",
+        "size": 11391
+      },
+      "file": [
+        {
+          "nama": "negatif.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-negatif-v1-negatif.gbfx",
+          "sha256": "de9ccca29e5cd56b9f176421a39566486f9d1f4842e7cd080bee680ab9af7a5e",
+          "size": 317
+        }
+      ]
+    },
+    {
+      "id": "filter-neon",
+      "kategori": "efek",
+      "nama": "Neon",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-neon-v1-thumb.png",
+        "sha256": "e3ebbc23ad70200d4d20fb700c609dc4393fb3c5c39ba7e5dae6ac0b454b77cc",
+        "size": 12171
+      },
+      "file": [
+        {
+          "nama": "neon.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-neon-v1-neon.gbfx",
+          "sha256": "51c10a3cd4e6c47820789cebc0d6a7e11501e4098c5269b62ad96025e9e190b0",
+          "size": 350
+        }
+      ]
+    },
+    {
+      "id": "filter-pastel",
+      "kategori": "efek",
+      "nama": "Pastel",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-pastel-v1-thumb.png",
+        "sha256": "07d69e05211e381f9add38bdc39961a90cb1c323a16636cfe9512b57642f17ed",
+        "size": 10456
+      },
+      "file": [
+        {
+          "nama": "pastel.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-pastel-v1-pastel.gbfx",
+          "sha256": "0e09901784adaa93a35053922c6ef4caf3582a4f71bbee179ef39baf66f5a034",
+          "size": 342
+        }
+      ]
+    },
+    {
+      "id": "filter-polaroid",
+      "kategori": "efek",
+      "nama": "Polaroid",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-polaroid-v1-thumb.png",
+        "sha256": "fc079a2161fa1d1a9f7b8894ab22bbbca02f12a8c834961b8847d42c3213ab12",
+        "size": 10751
+      },
+      "file": [
+        {
+          "nama": "polaroid.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-polaroid-v1-polaroid.gbfx",
+          "sha256": "20a5b4aa77299e6c1ec7537708410855c85e977a57bc50bbe57cde55d36b759a",
+          "size": 348
+        }
+      ]
+    },
+    {
+      "id": "filter-redup",
+      "kategori": "efek",
+      "nama": "Redup",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-redup-v1-thumb.png",
+        "sha256": "8d4d1cbd404dbd26b09f4da5677be4964e720b2c54d3366014680c4cd7a0939a",
+        "size": 10868
+      },
+      "file": [
+        {
+          "nama": "redup.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-redup-v1-redup.gbfx",
+          "sha256": "6c09133bfe4e2e82b4c9654aa2b3dec2783c9d168472843efa02740f06c03a69",
+          "size": 344
+        }
+      ]
+    },
+    {
+      "id": "filter-rembulan",
+      "kategori": "efek",
+      "nama": "Rembulan",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-rembulan-v1-thumb.png",
+        "sha256": "e4226c46c772206b1b1a30fd3ee5c334dc0f3bc687439a1ec6ba30768fae3d49",
+        "size": 10157
+      },
+      "file": [
+        {
+          "nama": "rembulan.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-rembulan-v1-rembulan.gbfx",
+          "sha256": "b33fe45d5ab49551eadbf969d0c20f04d873ff28eb2630fe80941f7f69da42bc",
+          "size": 343
+        }
+      ]
+    },
+    {
+      "id": "filter-retro-80an",
+      "kategori": "efek",
+      "nama": "Retro 80an",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-retro-80an-v1-thumb.png",
+        "sha256": "722fb1a76bbd81e9d5491fa04f22b4a257cf7b729615ffb339736e9f6cdfbb24",
+        "size": 12077
+      },
+      "file": [
+        {
+          "nama": "retro-80an.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-retro-80an-v1-retro-80an.gbfx",
+          "sha256": "20bff8bab45479e9232e7ee4883d519f4ed45e0908da1af430139d6f348879be",
+          "size": 359
+        }
+      ]
+    },
+    {
+      "id": "filter-senja-emas",
+      "kategori": "efek",
+      "nama": "Senja Emas",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-senja-emas-v1-thumb.png",
+        "sha256": "dc72c9aaf3bf008b8ae262f71008f1d84ae0c066aca358c489823e005811c687",
+        "size": 11640
+      },
+      "file": [
+        {
+          "nama": "senja-emas.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-senja-emas-v1-senja-emas.gbfx",
+          "sha256": "d2939f8e08b579bf8b1928376e978514b83111a4291f508d1c623bdc2f79975a",
+          "size": 362
+        }
+      ]
+    },
+    {
+      "id": "filter-sepia-pekat",
+      "kategori": "efek",
+      "nama": "Sepia Pekat",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-sepia-pekat-v1-thumb.png",
+        "sha256": "7e3ac34157ff9bb32ba976ca008683147d73ad0dcbbf7bba3ff708137b2f4d1f",
+        "size": 9985
+      },
+      "file": [
+        {
+          "nama": "sepia-pekat.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-sepia-pekat-v1-sepia-pekat.gbfx",
+          "sha256": "c300cf00cfd9014c89e934891616d1bf88d25e808062ef4bf420e91b83530d6c",
+          "size": 354
+        }
+      ]
+    },
+    {
+      "id": "filter-sinematik-teal",
+      "kategori": "efek",
+      "nama": "Sinematik Teal",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-sinematik-teal-v1-thumb.png",
+        "sha256": "d32d5a016d798999e718d376ebabd9082f425d1e2923fe1d34dc66b00e0dd74e",
+        "size": 11773
+      },
+      "file": [
+        {
+          "nama": "sinematik-teal.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-sinematik-teal-v1-sinematik-teal.gbfx",
+          "sha256": "292b75d262f90eb9da1cbe45d71d8b1fbc7ca726ea555a3962b1edea22c8e709",
+          "size": 362
+        }
+      ]
+    },
+    {
+      "id": "filter-teal-oranye",
+      "kategori": "efek",
+      "nama": "Teal Oranye",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-teal-oranye-v1-thumb.png",
+        "sha256": "9e93fa616cdda651b2ea38c23e988a2a1210788f4f8f58ad126a965d9b171a02",
+        "size": 11663
+      },
+      "file": [
+        {
+          "nama": "teal-oranye.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-teal-oranye-v1-teal-oranye.gbfx",
+          "sha256": "856bd2ededeb10f1f54525d95a9e17d5b0a8bed22ecbf69b37dcc92016e81bc4",
+          "size": 347
+        }
+      ]
+    },
+    {
+      "id": "filter-tropis",
+      "kategori": "efek",
+      "nama": "Tropis",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-tropis-v1-thumb.png",
+        "sha256": "cc75c480db4731baec00829517c8d5d734baeb89c8486c41b7b226b31da7c828",
+        "size": 12093
+      },
+      "file": [
+        {
+          "nama": "tropis.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-tropis-v1-tropis.gbfx",
+          "sha256": "ab2a673c49baa20898e0d606f8e92fb4df0d666c5a2348ef6535ce3562d7c8a4",
+          "size": 353
+        }
+      ]
+    },
+    {
+      "id": "filter-tukar-warna",
+      "kategori": "efek",
+      "nama": "Tukar Warna",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-tukar-warna-v1-thumb.png",
+        "sha256": "671cf579fe80bb3e348b2b230b8203e4a6e62d134329714601a64074cec787f1",
+        "size": 11386
+      },
+      "file": [
+        {
+          "nama": "tukar-warna.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-tukar-warna-v1-tukar-warna.gbfx",
+          "sha256": "72a29be90b90f7fa97294bb03dbd2e39809a295753ba0958c6594d2ffa68a6bc",
+          "size": 322
+        }
+      ]
+    },
+    {
+      "id": "filter-ungu-mistik",
+      "kategori": "efek",
+      "nama": "Ungu Mistik",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-ungu-mistik-v1-thumb.png",
+        "sha256": "212303ec6ac8bd1c9c6b1c4ab29cdbfce9b2d9feb979b1315a0581ddf015fe09",
+        "size": 11494
+      },
+      "file": [
+        {
+          "nama": "ungu-mistik.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-ungu-mistik-v1-ungu-mistik.gbfx",
+          "sha256": "d3866b91307204ca8aa1448f4995e573525a66b6716ff3d0b600dbe190f7256c",
+          "size": 339
+        }
+      ]
+    },
+    {
+      "id": "filter-vhs",
+      "kategori": "efek",
+      "nama": "VHS",
+      "premium": true,
+      "versi": 1,
+      "grup": "filter",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-vhs-v1-thumb.png",
+        "sha256": "0d1888f4086f68af3a20cbe6a5bb15020ab6b9240ffae835f3bbb5f694807d83",
+        "size": 11053
+      },
+      "file": [
+        {
+          "nama": "vhs.gbfx",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/efek/filter-vhs-v1-vhs.gbfx",
+          "sha256": "5a105a3220f63d926ea38269127859d07e5753f70323d93888afa445c40f9c4e",
+          "size": 324
+        }
+      ]
+    },
+    {
+      "id": "preset-lirik-gulir",
+      "kategori": "preset",
+      "nama": "Lirik Gulir",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.6",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-lirik-gulir-v1-thumb.png",
+        "sha256": "9e92cf7840394549199d86f374f203f385a48a09399fea7e228d974dc1955d30",
+        "size": 99321
+      },
+      "file": [
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-lirik-gulir-v1-preset.json",
+          "sha256": "1ed90e8e85783e9c9f424c966331a38119238b041a5abf8708b9382989cd915b",
+          "size": 525
+        }
+      ]
+    },
+    {
+      "id": "preset-kartu-musik",
+      "kategori": "preset",
+      "nama": "Kartu Musik",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.6",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kartu-musik-v1-thumb.png",
+        "sha256": "20d393fbeaebef0208d8f8b049f6a94880abe6572d36f719742a37a5dc7a33a2",
+        "size": 31931
+      },
+      "file": [
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-kartu-musik-v1-preset.json",
+          "sha256": "23e548d1ea75d2b7dd98043b3b308cdc76a087815f663467674627dfb37e2000",
+          "size": 466
+        }
+      ]
+    },
+    {
+      "id": "partikel-kelopak-ungu",
+      "kategori": "partikel",
+      "nama": "Kelopak ungu bercahaya",
+      "premium": false,
+      "versi": 1,
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-kelopak-ungu-v1-thumb.png",
+        "sha256": "97926c2992fe1d0424a1fb7a28b22aaf77c7a4298705682ec8d0ae9b3c432232",
+        "size": 31059
+      },
+      "file": [
+        {
+          "nama": "kelopak.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-kelopak-ungu-v1-kelopak.png",
+          "sha256": "b420aca0c61b1d7e879ed86fd55ce797c2206c193526489db2aabb7ac08be3e8",
+          "size": 37090
+        },
+        {
+          "nama": "partikel.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-kelopak-ungu-v1-partikel.json",
+          "sha256": "5c1b82630ea45b5fe2fefa630b9fdba2064c42a9fc2c1f5c8af5994abcb8037d",
+          "size": 817
+        }
+      ]
+    },
+    {
+      "id": "partikel-cincin-neon",
+      "kategori": "partikel",
+      "nama": "Cincin neon pelangi",
+      "premium": false,
+      "versi": 1,
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-cincin-neon-v1-thumb.png",
+        "sha256": "a8e6310fe22c88606649ee6aedad4fa177835b6b6cb1b5d26a63402f57b7fcd8",
+        "size": 66799
+      },
+      "file": [
+        {
+          "nama": "cincin.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-cincin-neon-v1-cincin.png",
+          "sha256": "09b8add15020e89a2fc511e7997edbfa970a9fbb8f491323d63e7b0c3ccfdf93",
+          "size": 34132
+        },
+        {
+          "nama": "partikel.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/partikel/partikel-cincin-neon-v1-partikel.json",
+          "sha256": "8fce4459092502f979709f312353ebccaa412c68523bf0c2e4e11c38941143b8",
+          "size": 3634
+        }
+      ]
+    },
+    {
+      "id": "preset-ayat-teduh",
+      "kategori": "preset",
+      "nama": "Ayat Teduh",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-ayat-teduh-v1-thumb.png",
+        "sha256": "6614350f8e5993445ae63b1b452084788e42460147a4613821e1531cb8a90acb",
+        "size": 79103
+      },
+      "file": [
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-ayat-teduh-v1-preset.json",
+          "sha256": "0cfa31e3188896ea74bf222b9cc9fef2a63448646bedce7fa9810f60d2910875",
+          "size": 957
+        }
+      ]
+    },
+    {
+      "id": "preset-shalawat-emas",
+      "kategori": "preset",
+      "nama": "Shalawat Emas",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.14",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-shalawat-emas-v1-thumb.png",
+        "sha256": "65ea923551b16bfa7765022b2f5c32e96e06c2d15a82d7556544f560d7d59971",
+        "size": 56631
+      },
+      "file": [
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-shalawat-emas-v1-preset.json",
+          "sha256": "b67bdf8a24984cce3ae2ad403425406547478c5310a924494aed0ecd27bafcea",
+          "size": 1072
+        }
+      ]
+    },
+    {
+      "id": "preset-senja-gugur",
+      "kategori": "preset",
+      "nama": "SenjaGugur",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-senja-gugur-v1-thumb.png",
+        "sha256": "a83bf3355b4ddb4e16d2ae5265dea3135cc01e3ad4c17dc7ecc11060de8b693d",
+        "size": 126059
+      },
+      "file": [
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-senja-gugur-v1-preset.json",
+          "sha256": "64f390a38f978bdbbce09f07322b03ab20d2f67242ea3a5fe4272fef9b03b5dd",
+          "size": 4165
+        },
+        {
+          "nama": "sakura.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-senja-gugur-v1-sakura.png",
+          "sha256": "a21fc15556c31161a1658e45cd8384b2781b6aa8a95734a73ad7135fca6eb59c",
+          "size": 49778
+        },
+        {
+          "nama": "senja-potret.jpg",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-senja-gugur-v1-senja-potret.jpg",
+          "sha256": "efcb22bcb60260baef2ad8022fa962fe03f7e4914b2b01b4ba0b0dc8c29b40dd",
+          "size": 237979
+        },
+        {
+          "nama": "senja.jpg",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-senja-gugur-v1-senja.jpg",
+          "sha256": "7a7d867d9dacb9caf8d82100325ee0655c37c26ea6b0efdd5b4b707481df5574",
+          "size": 235125
+        }
+      ]
+    },
+    {
+      "id": "preset-bara-kenangan",
+      "kategori": "preset",
+      "nama": "BaraKenangan",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bara-kenangan-v1-thumb.png",
+        "sha256": "e801cec452647a9263c6cb0a2c6522b9ebc3d3a717724f3d3c7e99db3b9a44c1",
+        "size": 216383
+      },
+      "file": [
+        {
+          "nama": "bara.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bara-kenangan-v1-bara.png",
+          "sha256": "c71134d771e28a3e2885ba0f080833b0fd582dd48ec100171e32dc8de2d9c1bf",
+          "size": 4898
+        },
+        {
+          "nama": "hati.png",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bara-kenangan-v1-hati.png",
+          "sha256": "4a30f5c0cd8dc14f985769ed0db131be63efaadce2e20a3de5f3df253afe7b30",
+          "size": 8854
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-bara-kenangan-v1-preset.json",
+          "sha256": "e646f7974cd5294ddf1f643cb72778096f442cc60eb9ae26d222e98cae4c75ef",
+          "size": 7346
+        }
+      ]
+    },
+    {
+      "id": "preset-panel-ayat",
+      "kategori": "preset",
+      "nama": "Panel Ayat",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-v1-thumb.png",
+        "sha256": "bd03d1588f8c33132664de13af073934357b255d1b3c690b664584c46e2fcdd7",
+        "size": 97647
+      },
+      "file": [
+        {
+          "nama": "panel.webp",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-v1-panel.webp",
+          "sha256": "985f352f61e9b845de94fd6065f65648276a86c2da9cc7df4cde0832a168d7f6",
+          "size": 89516
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-v1-preset.json",
+          "sha256": "a730f88258f8f24a5ac2028148921f927e58dbc1c601cde00e99f07ca5197a8d",
+          "size": 4860
+        }
+      ]
+    },
+    {
+      "id": "preset-panel-ayat-hijau",
+      "kategori": "preset",
+      "nama": "Panel Ayat Hijau",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.5",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-hijau-v1-thumb.png",
+        "sha256": "a66c4b0aaef504407d8b9b21be3d5033e783f3b698eb8865ec8197b9facfdb5e",
+        "size": 104589
+      },
+      "file": [
+        {
+          "nama": "panel.webp",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-hijau-v1-panel.webp",
+          "sha256": "5d86bc6450e00b588f0de8d27349fa828c4893e448db27c30825c0dc2e288815",
+          "size": 92498
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-panel-ayat-hijau-v1-preset.json",
+          "sha256": "5b8f9ab69766f7d77e070e8b39a3cadd17619afa9aa144fcac2f3f38866397b3",
+          "size": 4871
+        }
+      ]
+    },
+    {
+      "id": "preset-ayat-lantang",
+      "kategori": "preset",
+      "nama": "Ayat Lantang",
+      "premium": true,
+      "versi": 1,
+      "grup": "murotal",
+      "minApp": "0.1.19",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-ayat-lantang-v1-thumb.png",
+        "sha256": "f3730bdccc64575e28dcf2179b90063375ff554d170173ed4ccd62340946debe",
+        "size": 143480
+      },
+      "file": [
+        {
+          "nama": "luckiest-guy.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-ayat-lantang-v1-luckiest-guy.woff2",
+          "sha256": "7a975da2e8085d0c89cf6c21987af4b49c103ee0a09bb1c05c6c25ca897fad49",
+          "size": 21360
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-ayat-lantang-v1-preset.json",
+          "sha256": "bcf446cfacc69b0e3f773d2721812cc24b872147bc95a04e336f722a9cb5ab9c",
+          "size": 1103
+        }
+      ]
+    },
+    {
+      "id": "preset-anak-gelembung-kuning",
+      "kategori": "preset",
+      "nama": "Anak Gelembung Kuning",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.27",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-kuning-v1-thumb.png",
+        "sha256": "dca66b72fc4901bd08344fcb962293e0139295c298ab9b92e9f0ec7df4d34f68",
+        "size": 39001
+      },
+      "file": [
+        {
+          "nama": "OFL-Fredoka.txt",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-kuning-v1-OFL-Fredoka.txt",
+          "sha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab",
+          "size": 4388
+        },
+        {
+          "nama": "fredoka-bold.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-kuning-v1-fredoka-bold.woff2",
+          "sha256": "c4dd8f13ef1ae7558f0c9b879507b7bc407bf42f73d1a8b29dbed4b8eb2f44ae",
+          "size": 14944
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-kuning-v1-preset.json",
+          "sha256": "f2565093eed44c8edc2be1b6ea9dbc16864a91b8cc95439a767a89950d1848d8",
+          "size": 829
+        }
+      ]
+    },
+    {
+      "id": "preset-anak-gelembung-pink",
+      "kategori": "preset",
+      "nama": "Anak Gelembung Pink",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.27",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-pink-v1-thumb.png",
+        "sha256": "bf8fc306eee9cb8f1f349fb8f94be03b730365b069fdb98f5a7fa5f3a2c5c1b7",
+        "size": 37928
+      },
+      "file": [
+        {
+          "nama": "OFL-Fredoka.txt",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-pink-v1-OFL-Fredoka.txt",
+          "sha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab",
+          "size": 4388
+        },
+        {
+          "nama": "fredoka-bold.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-pink-v1-fredoka-bold.woff2",
+          "sha256": "c4dd8f13ef1ae7558f0c9b879507b7bc407bf42f73d1a8b29dbed4b8eb2f44ae",
+          "size": 14944
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-pink-v1-preset.json",
+          "sha256": "b255cf6e2678c481587678feda4154a748633d74c03920ccb09fcfc221febbae",
+          "size": 935
+        }
+      ]
+    },
+    {
+      "id": "preset-anak-gelembung-biru",
+      "kategori": "preset",
+      "nama": "Anak Gelembung Biru",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.27",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-biru-v1-thumb.png",
+        "sha256": "4e470b5c4f569aa3a74c214011a26c184e1532661999977881b7585a5dc64324",
+        "size": 38410
+      },
+      "file": [
+        {
+          "nama": "OFL-Fredoka.txt",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-biru-v1-OFL-Fredoka.txt",
+          "sha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab",
+          "size": 4388
+        },
+        {
+          "nama": "fredoka-bold.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-biru-v1-fredoka-bold.woff2",
+          "sha256": "c4dd8f13ef1ae7558f0c9b879507b7bc407bf42f73d1a8b29dbed4b8eb2f44ae",
+          "size": 14944
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-biru-v1-preset.json",
+          "sha256": "269ef65ec42336f07c6df8ddee0d38059d7ec4f9a77811c18c5c81a0eede628f",
+          "size": 935
+        }
+      ]
+    },
+    {
+      "id": "preset-anak-gelembung-hijau",
+      "kategori": "preset",
+      "nama": "Anak Gelembung Hijau",
+      "premium": true,
+      "versi": 1,
+      "grup": "umum",
+      "minApp": "0.1.27",
+      "thumb": {
+        "nama": "thumb.png",
+        "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-hijau-v1-thumb.png",
+        "sha256": "f50a4ded2f0748b839d01393ef527e40876d14a76b2f73ff767418070d229037",
+        "size": 38842
+      },
+      "file": [
+        {
+          "nama": "OFL-Fredoka.txt",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-hijau-v1-OFL-Fredoka.txt",
+          "sha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab",
+          "size": 4388
+        },
+        {
+          "nama": "fredoka-bold.woff2",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-hijau-v1-fredoka-bold.woff2",
+          "sha256": "c4dd8f13ef1ae7558f0c9b879507b7bc407bf42f73d1a8b29dbed4b8eb2f44ae",
+          "size": 14944
+        },
+        {
+          "nama": "preset.json",
+          "url": "https://github.com/gebangkiidiw/GebangEditor-Konten/releases/download/preset/preset-anak-gelembung-hijau-v1-preset.json",
+          "sha256": "55ae053026a9dd7fe8ab0c508ef7514dd6e35b7f41795efd928862b44db8e97d",
+          "size": 934
+        }
+      ]
+    }
+  ]
+}
