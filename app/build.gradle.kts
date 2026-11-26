@@ -32,6 +32,7 @@ dependencies {
     implementation("androidx.media3:media3-transformer:1.5.1")
     implementation("androidx.media3:media3-effect:1.5.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("com.google.code.gson:gson:2.11.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")
 }
