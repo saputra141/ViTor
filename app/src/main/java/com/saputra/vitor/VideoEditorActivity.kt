@@ -25,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material3.Button
@@ -172,6 +174,7 @@ private fun VideoEditorScreen() {
             } else {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     clips.forEach { clip ->
+                        val clipIndex = clips.indexOf(clip)
                         Card(
                             onClick = { selected = clip },
                             colors = CardDefaults.cardColors(
@@ -179,12 +182,36 @@ private fun VideoEditorScreen() {
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Row(Modifier.width(210.dp).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.width(250.dp).padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Movie, null, tint = Color(0xFFAAA0FF))
-                                Spacer(Modifier.width(8.dp))
+                                Spacer(Modifier.width(6.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(clip.name, color = Color.White, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                    Text(clip.name, color = Color.White, fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                     Text(formatTime(clip.durationMs), color = Color(0xFFAAAAB8), fontSize = 10.sp)
+                                }
+                                IconButton(
+                                    onClick = {
+                                        if (clipIndex > 0) {
+                                            val previous = clips[clipIndex - 1]
+                                            clips[clipIndex - 1] = clip
+                                            clips[clipIndex] = previous
+                                        }
+                                    },
+                                    enabled = clipIndex > 0
+                                ) {
+                                    Icon(Icons.Default.ArrowBack, "Geser klip ke kiri", tint = Color(0xFFBDB8FF))
+                                }
+                                IconButton(
+                                    onClick = {
+                                        if (clipIndex < clips.lastIndex) {
+                                            val next = clips[clipIndex + 1]
+                                            clips[clipIndex + 1] = clip
+                                            clips[clipIndex] = next
+                                        }
+                                    },
+                                    enabled = clipIndex < clips.lastIndex
+                                ) {
+                                    Icon(Icons.Default.ArrowForward, "Geser klip ke kanan", tint = Color(0xFFBDB8FF))
                                 }
                                 IconButton(onClick = {
                                     clips.remove(clip)
@@ -195,6 +222,29 @@ private fun VideoEditorScreen() {
                             }
                         }
                     }
+                }
+                Text("Urutan dari kiri ke kanan adalah urutan hasil video. Gunakan panah untuk mengatur posisi klip.", color = Color(0xFF9292A0), fontSize = 10.sp)
+                Button(
+                    onClick = {
+                        exporting = true
+                        status = "Menggabungkan ${clips.size} klip menjadi satu MP4..."
+                        exportMergedClips(
+                            context = context,
+                            clipUris = clips.map { it.uri },
+                            onComplete = {
+                                exporting = false
+                                status = "Video gabungan selesai. Periksa folder Movies/ViTor."
+                            },
+                            onFailure = { error ->
+                                exporting = false
+                                status = "Penggabungan gagal: $error"
+                            }
+                        )
+                    },
+                    enabled = clips.size >= 2 && !exporting,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (exporting) "Sedang merender..." else "Gabung & Ekspor Semua Klip")
                 }
             }
 
@@ -224,9 +274,9 @@ private fun VideoEditorScreen() {
                                 status = "Merender video..."
                                 exportTrimmedClip(
                                     context, clip.uri, trimRange.start.toLong(), trimRange.endInclusive.toLong(),
-                                    onComplete = { saved ->
+                                    onComplete = {
                                         exporting = false
-                                        status = if (saved != null) "Video tersimpan di Movies/ViTor." else "Ekspor selesai. Periksa folder Movies/ViTor."
+                                        status = "Video hasil potong selesai. Periksa folder Movies/ViTor."
                                     },
                                     onFailure = { error ->
                                         exporting = false
@@ -244,7 +294,7 @@ private fun VideoEditorScreen() {
             }
 
             Text(status, color = Color(0xFFBDB8FF), fontSize = 11.sp)
-            Text("ViTor 0.4.0 • Fitur edit aktif: trim dan ekspor MP4", color = Color(0xFF686A78), fontSize = 10.sp)
+            Text("ViTor 0.5.0 • Trim, susun ulang, gabung, dan ekspor MP4", color = Color(0xFF686A78), fontSize = 10.sp)
         }
     }
 }
