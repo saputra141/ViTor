@@ -1,0 +1,49 @@
+name: ViTor Play Store Bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Prepare upload keystore
+        env:
+          VITOR_UPLOAD_KEYSTORE_BASE64: ${{ secrets.VITOR_UPLOAD_KEYSTORE_BASE64 }}
+          VITOR_UPLOAD_STORE_PASSWORD: ${{ secrets.VITOR_UPLOAD_STORE_PASSWORD }}
+          VITOR_UPLOAD_KEY_ALIAS: ${{ secrets.VITOR_UPLOAD_KEY_ALIAS }}
+          VITOR_UPLOAD_KEY_PASSWORD: ${{ secrets.VITOR_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$VITOR_UPLOAD_KEYSTORE_BASE64" || (echo "Missing VITOR_UPLOAD_KEYSTORE_BASE64 secret" && exit 1)
+          test -n "$VITOR_UPLOAD_STORE_PASSWORD" || (echo "Missing VITOR_UPLOAD_STORE_PASSWORD secret" && exit 1)
+          test -n "$VITOR_UPLOAD_KEY_ALIAS" || (echo "Missing VITOR_UPLOAD_KEY_ALIAS secret" && exit 1)
+          test -n "$VITOR_UPLOAD_KEY_PASSWORD" || (echo "Missing VITOR_UPLOAD_KEY_PASSWORD secret" && exit 1)
+          KEYSTORE_PATH="$RUNNER_TEMP/vitor-upload.jks"
+          printf '%s' "$VITOR_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+          echo "VITOR_UPLOAD_STORE_FILE=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          echo "VITOR_UPLOAD_STORE_PASSWORD=$VITOR_UPLOAD_STORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "VITOR_UPLOAD_KEY_ALIAS=$VITOR_UPLOAD_KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "VITOR_UPLOAD_KEY_PASSWORD=$VITOR_UPLOAD_KEY_PASSWORD" >> "$GITHUB_ENV"
+      - name: Build signed Android App Bundle
+        run: gradle :app:bundleRelease
+      - name: Upload Play Store AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ViTor-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
