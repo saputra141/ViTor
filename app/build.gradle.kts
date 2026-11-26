@@ -3,16 +3,42 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+
+val uploadStoreFile = System.getenv("VITOR_UPLOAD_STORE_FILE")
+val uploadStorePassword = System.getenv("VITOR_UPLOAD_STORE_PASSWORD")
+val uploadKeyAlias = System.getenv("VITOR_UPLOAD_KEY_ALIAS")
+val uploadKeyPassword = System.getenv("VITOR_UPLOAD_KEY_PASSWORD")
+
 android {
     namespace = "com.saputra.vitor"
-    compileSdk = 35
+    compileSdk = 36
+
     defaultConfig {
         applicationId = "com.saputra.vitor"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 3
-        versionName = "0.3.0"
+        targetSdk = 36
+        versionCode = 7
+        versionName = "0.7.0"
     }
+
+    signingConfigs {
+        create("release") {
+            if (!uploadStoreFile.isNullOrBlank()) {
+                storeFile = file(uploadStoreFile)
+                storePassword = uploadStorePassword
+                keyAlias = uploadKeyAlias
+                keyPassword = uploadKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -20,6 +46,7 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
 }
+
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.12.01"))
     implementation("androidx.activity:activity-compose:1.9.3")
@@ -29,6 +56,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.media3:media3-exoplayer:1.5.1")
     implementation("androidx.media3:media3-ui:1.5.1")
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("androidx.media3:media3-transformer:1.5.1")
+    implementation("androidx.media3:media3-effect:1.5.1")
+    implementation("com.google.code.gson:gson:2.11.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    testImplementation("junit:junit:4.13.2")
 }

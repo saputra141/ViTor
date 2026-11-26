@@ -1,25 +1,33 @@
 # ViTor
 
-ViTor adalah proyek porting native Android ARM64 untuk mengadaptasi alur editor video Gebang Editor.
+ViTor adalah editor video native Android yang sedang dikembangkan dengan Kotlin, Jetpack Compose, dan AndroidX Media3.
 
-## Sumber asli yang dipakai
-- Katalog konten resmi: https://github.com/gebangkiidiw/GebangEditor-Konten
-- Katalog JSON disalin apa adanya ke `app/src/main/assets/gebang/katalog.json`.
-- Thumbnail diambil dari URL sumber yang tercantum di katalog.
-- Nama item, kategori, status premium/gratis, dan daftar nama file tidak dibuat ulang oleh ViTor.
+## Fitur yang tersedia pada tahap pengembangan
+- Impor beberapa video melalui pemilih dokumen Android.
+- Pratinjau video.
+- Susun ulang dan hapus klip.
+- Potong rentang setiap klip dan ekspor MP4; trim tiap klip disimpan dalam proyek.
+- Gabungkan klip sesuai urutan.
+- Tambahkan musik latar dan atur volumenya.
+- Tambahkan judul teks statis dan filter video.
+- Impor, edit teks, tambah, hapus, dan ekspor subtitle SRT.
+- Render subtitle bertiming ke video MP4.
+- Simpan dan buka data proyek lokal.
 
-## Batas sumber yang tersedia
-Repositori publik Gebang Editor yang diperiksa menyediakan katalog konten dan paket rilis desktop, tetapi tidak menyediakan source code mesin editor Android atau desktop. Paket desktop yang tersedia adalah binary Windows/macOS; binary itu bukan APK dan tidak dapat langsung dijalankan sebagai aplikasi Android. Karena itu, ViTor belum bisa diklaim setara dengan Gebang Editor.
+## Fitur yang masih perlu diselesaikan
+- Timeline multitrack visual dengan pengeditan independen untuk setiap track.
+- Split klip non-destruktif dan transisi antar-klip.
+- Mesin speech-to-text offline untuk Auto Caption.
+- Mesin pengenalan lirik dan penyelarasan kata untuk Auto Lyrics.
+- Transisi, keyframe, animasi teks, dan efek per-klip.
+- Mesin speech-to-text offline untuk Auto Caption.
+- Mesin pengenalan lirik dan penyelarasan kata untuk Auto Lyrics.
+- Pengujian kompatibilitas codec, performa, dan stabilitas di perangkat nyata.
 
-## Status
-- [x] Kerangka Android native Kotlin + Jetpack Compose.
-- [x] Import video lokal dan preview Media3.
-- [x] Membaca katalog asli 78 item dari aset sumber.
-- [x] Menampilkan thumbnail asli dari URL yang tercantum di katalog.
-- [ ] Mengurai dan menerapkan format preset/efek asli.
-- [ ] Timeline editing, trim, audio, teks, dan layer fungsional.
-- [ ] Rendering dan ekspor video.
-- [ ] Pengujian perangkat ARM64.
+## Privasi dan pemrosesan
+Aplikasi dirancang untuk memproses file pilihan pengguna secara lokal. Aplikasi tidak memerlukan akun. Email dukungan: koinklub@gmail.com. Lihat draf kebijakan privasi di `docs/PRIVACY_POLICY_ID.md`; dokumen tersebut harus ditinjau dan dipublikasikan pada URL publik sebelum rilis.
 
 ## Build
-GitHub Actions workflow **Android CI** membangun APK debug.
+CI menjalankan unit test dan membangun APK debug. Workflow rilis AAB membutuhkan upload keystore dan secret signing yang dikelola pemilik akun developer. Lihat `docs/PLAY_STORE_RELEASE_CHECKLIST_ID.md`.
+
+Build CI yang sukses membuktikan kompilasi dan pengujian unit yang tersedia, bukan pengujian runtime pada seluruh perangkat.
