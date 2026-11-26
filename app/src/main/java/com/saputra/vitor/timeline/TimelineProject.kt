@@ -68,7 +68,8 @@ data class TimelineProject(
     val videoClips: List<VideoClip> = emptyList(),
     val audioLayers: List<AudioLayer> = emptyList(),
     val textLayers: List<TextLayer> = emptyList(),
-    val subtitleCues: List<SubtitleCue> = emptyList()
+    val subtitleCues: List<SubtitleCue> = emptyList(),
+    val videoLook: String = "ORIGINAL"
 ) {
     init {
         require(name.isNotBlank())

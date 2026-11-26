@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -64,8 +66,15 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.saputra.vitor.subtitles.SubtitleCue
 import com.saputra.vitor.subtitles.SrtCodec
+import com.saputra.vitor.timeline.AudioLayer
+import com.saputra.vitor.timeline.ProjectFileStore
+import com.saputra.vitor.timeline.TextLayer
+import com.saputra.vitor.timeline.TimelineProject
+import com.saputra.vitor.timeline.VideoClip
+import java.io.File
+import java.util.UUID
 
-private data class EditClip(val uri: Uri, val name: String, val durationMs: Long)
+private data class EditClip(val id: String, val uri: Uri, val name: String, val durationMs: Long)
 
 class VideoEditorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,6 +105,12 @@ private fun VideoEditorScreen() {
     var titleText by remember { mutableStateOf("") }
     var musicVolume by remember { mutableStateOf(0.75f) }
     var selectedLook by remember { mutableStateOf(VideoLook.ORIGINAL) }
+    var projectName by remember { mutableStateOf("Untitled project") }
+    var projectId by remember { mutableStateOf<String?>(null) }
+    var savedProjects by remember { mutableStateOf(emptyList<ProjectFileStore.ProjectSummary>()) }
+    var showProjectDialog by remember { mutableStateOf(false) }
+    var musicDurationMs by remember { mutableStateOf(0L) }
+    val projectStore = remember(context) { ProjectFileStore(File(context.filesDir, "ViTorProjects")) }
     val subtitleCues = remember { mutableStateListOf<SubtitleCue>() }
 
     val subtitlePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -142,7 +157,7 @@ private fun VideoEditorScreen() {
                 }
             }.getOrNull() ?: "Video ${clips.size + 1}"
             val duration = readDuration(context, uri)
-            val clip = EditClip(uri, name, duration)
+            val clip = EditClip(UUID.randomUUID().toString(), uri, name, duration)
             clips.add(clip)
             selected = clip
             trimRange = 0f..duration.coerceAtLeast(1L).toFloat()
@@ -158,6 +173,7 @@ private fun VideoEditorScreen() {
                 )
             }
             musicUri = uri
+            musicDurationMs = readDuration(context, uri).coerceAtLeast(1L)
             status = "Musik latar ditambahkan ke proyek."
         }
     }
@@ -178,15 +194,65 @@ private fun VideoEditorScreen() {
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("ViTor Studio", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                    Text("Editor video native Android", color = Color(0xFFAAAAB8), fontSize = 12.sp)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("ViTor Studio", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                        Text(projectName, color = Color(0xFFAAAAB8), fontSize = 12.sp)
+                    }
+                    Button(onClick = { picker.launch(arrayOf("video/*")) }, enabled = !exporting) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Import")
+                    }
                 }
-                Button(onClick = { picker.launch(arrayOf("video/*")) }) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(Modifier.width(6.dp))
-                    Text("Import")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = {
+                        runCatching {
+                            val duration = clips.sumOf { it.durationMs.coerceAtLeast(1L) }
+                            val current = selected
+                            val videoTracks = clips.map { clip ->
+                                val isSelected = clip.id == current?.id
+                                val start = if (isSelected) trimRange.start.toLong().coerceIn(0L, (clip.durationMs - 1L).coerceAtLeast(0L)) else 0L
+                                val end = if (isSelected) trimRange.endInclusive.toLong().coerceIn(start + 1L, clip.durationMs.coerceAtLeast(start + 1L)) else clip.durationMs.coerceAtLeast(1L)
+                                VideoClip(
+                                    id = clip.id,
+                                    sourceUri = clip.uri.toString(),
+                                    sourceDurationMs = clip.durationMs.coerceAtLeast(1L),
+                                    trimStartMs = start,
+                                    trimEndMs = end
+                                )
+                            }
+                            val audioTracks = musicUri?.let { uri ->
+                                listOf(AudioLayer(
+                                    id = "background-music",
+                                    sourceUri = uri.toString(),
+                                    sourceEndMs = musicDurationMs.coerceAtLeast(1L),
+                                    volume = musicVolume,
+                                    loop = true
+                                ))
+                            }.orEmpty()
+                            val textTracks = if (titleText.isNotBlank()) {
+                                listOf(TextLayer("main-title", titleText, 0L, duration.coerceAtLeast(2_000L)))
+                            } else emptyList()
+                            val project = TimelineProject(
+                                name = projectName,
+                                videoClips = videoTracks,
+                                audioLayers = audioTracks,
+                                textLayers = textTracks,
+                                subtitleCues = subtitleCues.toList(),
+                                videoLook = selectedLook.name
+                            )
+                            val id = projectId ?: UUID.randomUUID().toString()
+                            val saved = projectStore.save(project, id)
+                            projectId = saved.projectId
+                            status = "Proyek berhasil disimpan."
+                        }.onFailure { status = "Gagal menyimpan proyek: ${it.message}" }
+                    }, enabled = !exporting) { Text("Simpan Proyek") }
+                    OutlinedButton(onClick = {
+                        savedProjects = projectStore.list()
+                        showProjectDialog = true
+                    }, enabled = !exporting) { Text("Buka Proyek") }
                 }
             }
 
@@ -320,7 +386,7 @@ private fun VideoEditorScreen() {
                             Text(if (musicUri == null) "Tambah Musik" else "Ganti Musik")
                         }
                         if (musicUri != null) {
-                            OutlinedButton(onClick = { musicUri = null }, enabled = !exporting) {
+                            OutlinedButton(onClick = { musicUri = null; musicDurationMs = 0L }, enabled = !exporting) {
                                 Text("Hapus Musik")
                             }
                         }
@@ -464,8 +530,73 @@ private fun VideoEditorScreen() {
             Text(status, color = Color(0xFFBDB8FF), fontSize = 11.sp)
             Text("ViTor 0.6.0 • Video, musik, teks, filter, trim, dan render", color = Color(0xFF686A78), fontSize = 10.sp)
         }
+        if (showProjectDialog) {
+            AlertDialog(
+                onDismissRequest = { showProjectDialog = false },
+                title = { Text("Buka proyek") },
+                text = {
+                    if (savedProjects.isEmpty()) {
+                        Text("Belum ada proyek tersimpan.")
+                    } else {
+                        Column(
+                            Modifier.height(260.dp).verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            savedProjects.forEach { summary ->
+                                TextButton(
+                                    onClick = {
+                                        runCatching {
+                                            val project = projectStore.load(summary.projectId)
+                                            clips.clear()
+                                            project.videoClips.forEach { saved ->
+                                                val uri = Uri.parse(saved.sourceUri)
+                                                val name = queryDisplayName(context, uri) ?: "Video ${clips.size + 1}"
+                                                clips.add(EditClip(saved.id, uri, name, saved.sourceDurationMs))
+                                            }
+                                            selected = clips.firstOrNull()
+                                            selected?.let { clip ->
+                                                val saved = project.videoClips.first { it.id == clip.id }
+                                                trimRange = saved.trimStartMs.toFloat()..saved.trimEndMs.toFloat()
+                                            }
+                                            val audio = project.audioLayers.firstOrNull()
+                                            musicUri = audio?.let { Uri.parse(it.sourceUri) }
+                                            musicDurationMs = audio?.durationMs ?: 0L
+                                            musicVolume = audio?.volume ?: 0.75f
+                                            titleText = project.textLayers.firstOrNull()?.text.orEmpty()
+                                            selectedLook = runCatching { VideoLook.valueOf(project.videoLook) }.getOrDefault(VideoLook.ORIGINAL)
+                                            subtitleCues.clear()
+                                            subtitleCues.addAll(project.subtitleCues)
+                                            projectName = project.name
+                                            projectId = summary.projectId
+                                            status = "Proyek berhasil dibuka."
+                                            showProjectDialog = false
+                                        }.onFailure { status = "Gagal membuka proyek: ${it.message}" }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(Modifier.fillMaxWidth()) {
+                                        Text(summary.name, color = Color.White)
+                                        Text("ID: ${summary.projectId}", color = Color(0xFF9292A0), fontSize = 10.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showProjectDialog = false }) { Text("Tutup") }
+                }
+            )
+        }
     }
-}
+
+private fun queryDisplayName(context: android.content.Context, uri: Uri): String? =
+    runCatching {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (cursor.moveToFirst() && index >= 0) cursor.getString(index) else null
+        }
+    }.getOrNull()
 
 private fun readDuration(context: android.content.Context, uri: Uri): Long {
     val retriever = MediaMetadataRetriever()
