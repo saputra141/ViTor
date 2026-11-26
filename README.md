@@ -9,25 +9,29 @@ ViTor adalah proyek editor video native Android ARM64 yang sedang dikembangkan u
 - Repositori publik yang diperiksa belum menyediakan source code mesin editor. Karena itu, ViTor membangun mesin native sendiri dan tidak mengklaim identik sebelum diuji terhadap aplikasi sumber.
 
 ## Kondisi implementasi saat ini
+
 - [x] Kerangka Android native Kotlin + Jetpack Compose.
-- [x] Import video lokal dan preview Media3.
-- [x] Membaca katalog konten sumber.
+- [x] Import beberapa video lokal dengan izin URI persisten.
+- [x] Preview klip menggunakan Media3 ExoPlayer.
+- [x] Daftar klip, pilih, hapus, dan ubah urutan.
+- [x] Trim satu klip berdasarkan rentang waktu dan ekspor MP4.
+- [x] Gabungkan klip sesuai urutan daftar menggunakan Media3 Transformer.
+- [x] Tambahkan musik latar, atur level volume musik, dan loop track musik saat render.
+- [x] Terapkan judul teks statis dan filter asli, grayscale, atau high-contrast saat render.
 - [x] Model data subtitle dengan timestamp milidetik dan timing per kata.
-- [x] Parser dan writer subtitle SRT.
-- [x] Import beberapa klip, preview, pilih/hapus klip di timeline.
-- [x] Trim klip dengan rentang awal/akhir dan ekspor MP4 baru.
-- [x] Mengubah urutan klip di timeline.
-- [x] Menggabungkan urutan klip menjadi satu MP4 menggunakan Media3 Composition.
-- [ ] Track audio terpisah dan pencampuran musik latar.
-- [ ] Teks overlay, efek, transisi, dan rendering komposisi lengkap.
-- [ ] UI track subtitle dan penyuntingan cue di timeline.
-- [ ] Mesin speech-to-text offline untuk vlog.
-- [ ] Pengenalan lirik dan penyelarasan per kata untuk video musik.
+- [x] Impor, edit teks, tambah, hapus, dan ekspor subtitle SRT.
+- [ ] Timeline multitrack visual yang dapat menggeser dan memangkas setiap track secara independen.
+- [ ] Simpan/buka proyek agar susunan klip, audio, teks, filter, dan subtitle dapat dilanjutkan.
+- [ ] Subtitle bertiming yang dapat dibakar ke video hasil render.
+- [ ] Transisi, keyframe, animasi teks, dan efek per-klip.
+- [ ] Mesin speech-to-text offline untuk Auto Caption.
+- [ ] Pengenalan lirik dan penyelarasan per kata untuk Auto Lyrics.
 
-## Status editor 0.5.0
-ViTor dapat mengimpor beberapa video, mengatur urutan klip dengan tombol panah, memilih klip, memotong satu klip berdasarkan rentang waktu, dan mengekspor gabungan klip sebagai satu file MP4. Penggabungan menggunakan urutan kiri ke kanan pada timeline. Hasil ekspor disimpan pada folder `Movies/ViTor` di Galeri pada Android 10 ke atas. File sumber tidak dimodifikasi.
+## Status implementasi 0.6.0
 
-Penggabungan bergantung pada dukungan codec dan track dari perangkat melalui Media3 Transformer. Jika format audio/video antar klip tidak kompatibel atau tidak didukung perangkat, proses ekspor dapat gagal dan aplikasi harus menampilkan pesan kesalahan. Belum ada crossfade/transisi antar klip.
+Versi pengembangan 0.6.0 memiliki impor beberapa klip, preview, pengaturan urutan, trim dan ekspor klip, penggabungan klip, musik latar dengan kontrol volume, judul teks statis, filter video, serta pengelolaan subtitle SRT. Subtitle saat ini dapat diimpor, diedit, ditambah, dihapus, dan diekspor kembali. Subtitle belum dibakar ke hasil video. UI timeline saat ini masih berupa daftar klip berurutan, belum menjadi timeline multitrack penuh.
+
+Ekspor menggunakan Media3 Transformer. Keberhasilan build dan unit test CI membuktikan kompilasi dan pengujian unit yang tersedia, bukan validasi runtime pada seluruh perangkat atau codec. Pengujian perangkat ARM64 tetap diperlukan untuk memastikan hasil render, sinkronisasi audio, kompatibilitas codec, performa, dan penggunaan memori.
 
 ## Rencana Auto Caption dan Auto Lyrics
 Targetnya adalah pemrosesan audio lokal di perangkat, dengan model yang dapat diunduh/dikelola terpisah dari APK. Speech-to-text untuk vlog dan pengenalan lirik lagu diperlakukan sebagai dua mode berbeda. Hasil pengenalan harus dapat dikoreksi manual. Mode lirik membutuhkan word-level alignment agar sorotan karaoke mengikuti audio.
