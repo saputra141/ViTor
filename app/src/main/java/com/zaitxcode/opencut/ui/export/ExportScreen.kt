@@ -225,23 +225,32 @@ fun ExportScreen(
                     error = null
                     result = null
                     scope.launch {
-                        val output = File(app.projectStore.exportDir(context), "opencut_export.mp4")
-                        val settings = ExportSettings(
-                            width = resolution.width,
-                            height = resolution.height,
-                            frameRate = frameRate,
-                            bitRate = resolution.bitRate,
-                        )
-                        val outcome = withContext(Dispatchers.Default) {
-                            ExportEngine(context).export(current, output, settings) { report: ExportProgress ->
-                                progress = report.percent
-                                stage = report.stage
+                        try {
+                            // Keep previous renders: every export receives a unique filename.
+                            val output = File(
+                                app.projectStore.exportDir(context),
+                                "ViTor_${System.currentTimeMillis()}.mp4",
+                            )
+                            val settings = ExportSettings(
+                                width = resolution.width,
+                                height = resolution.height,
+                                frameRate = frameRate,
+                                bitRate = resolution.bitRate,
+                            )
+                            val outcome = withContext(Dispatchers.Default) {
+                                ExportEngine(context).export(current, output, settings) { report: ExportProgress ->
+                                    progress = report.percent
+                                    stage = report.stage
+                                }
                             }
+                            outcome
+                                .onSuccess { result = it }
+                                .onFailure { error = it.message ?: it::class.java.simpleName }
+                        } catch (failure: Exception) {
+                            error = failure.message ?: failure::class.java.simpleName
+                        } finally {
+                            running = false
                         }
-                        running = false
-                        outcome
-                            .onSuccess { result = it }
-                            .onFailure { error = it.message ?: it::class.java.simpleName }
                     }
                 },
                 enabled = project != null && !running,
