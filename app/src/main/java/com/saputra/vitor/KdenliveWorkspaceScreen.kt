@@ -122,7 +122,7 @@ fun KdenliveWorkspaceScreen(
                 Box(Modifier.fillMaxWidth().weight(1f).padding(12.dp).background(Color(0xFF050608)), contentAlignment = Alignment.Center) {
                     if (selectedMedia != null) {
                         AndroidView(
-                            factory = { ctx -> PlayerView(ctx).apply { player = player; useController = true } },
+                            factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             update = { it.player = player },
                             modifier = Modifier.fillMaxSize()
                         )
@@ -179,14 +179,18 @@ fun KdenliveWorkspaceScreen(
                 Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(5.dp)) {
                     repeat(4) { index ->
                         Box(Modifier.width(760.dp).weight(1f).border(0.5.dp, KdLine)) {
-                            if (index == 1) {
+                            if (index == 1 && mediaUris.isNotEmpty()) {
                                 Row(Modifier.fillMaxHeight().padding(start = 18.dp, top = 3.dp, bottom = 3.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    TimelineClip("Video 01", Modifier.width(180.dp), selectedClip == "Video 01") { selectedClip = "Video 01" }
-                                    TimelineClip("Clip 01", Modifier.width(140.dp), selectedClip == "Clip 01") { selectedClip = "Clip 01" }
+                                    mediaUris.forEachIndexed { mediaIndex, uri ->
+                                        val label = uri.lastPathSegment?.substringAfterLast('/')?.takeLast(20) ?: "Media ${mediaIndex + 1}"
+                                        TimelineClip(label, Modifier.width(160.dp), selectedMedia == uri) {
+                                            selectedMedia = uri
+                                            selectedClip = label
+                                        }
+                                    }
                                 }
-                            }
-                            if (index == 2) {
-                                TimelineClip("Audio 01", Modifier.padding(start = 60.dp, top = 3.dp, bottom = 3.dp).width(260.dp), false) { selectedClip = "Audio 01" }
+                            } else if (index == 1) {
+                                Text("Import media to populate the timeline", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
                             }
                         }
                     }
