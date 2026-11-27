@@ -180,6 +180,7 @@ class PreviewRenderer(private val context: Context) {
             GLES20.glDeleteTextures(textures.size, textures.values.toIntArray(), 0)
             textures.clear()
         }
+        LutFactory.releaseAll()
         composer.release()
     }
 
