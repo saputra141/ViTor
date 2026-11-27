@@ -103,7 +103,21 @@ class PreviewRenderer(private val context: Context) {
 
         for (layer in current.layers) {
             if (!layerVisible(layer, current.playheadUs)) continue
-            val texture = resolveTexture(layer) ?: continue
+            val decoder = if (layer.kind == LayerKind.VIDEO) decoderFor(layer) else null
+            val texture = if (layer.kind == LayerKind.VIDEO) {
+                decoder?.let {
+                    val offsetUs = current.playheadUs - layer.targetStartUs
+                    val sourceTimeUs = layer.sourceStartUs + (offsetUs * layer.speed).toLong()
+                    if (sourceTimeUs + FRAME_TOLERANCE_US < it.lastFrameTimeUs) {
+                        it.seekTo(sourceTimeUs)
+                    }
+                    it.advanceTo(sourceTimeUs)
+                    it.latchFrame()
+                    it.textureId
+                }
+            } else {
+                resolveTexture(layer)
+            } ?: continue
             val look = LutFactory.lookOf(layer.filter)
             composer.drawLayer(
                 layer = layer,
@@ -113,6 +127,7 @@ class PreviewRenderer(private val context: Context) {
                 playheadUs = current.playheadUs,
                 lutTexture = look?.let { LutFactory.textureFor(it) } ?: 0,
                 lutIntensity = layer.filter?.intensity ?: 1f,
+                textureTransform = decoder?.textureTransformMatrix,
             )
         }
         composer.disableBlend()
