@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
@@ -33,6 +34,14 @@ private val KdText = Color(0xFFE5E7EB)
 private val KdMuted = Color(0xFF9AA1AC)
 private val KdAccent = Color(0xFF3DAEE9)
 
+private data class KdTimelineClip(
+    val id: Long,
+    val uri: Uri,
+    val label: String,
+    val sourceInMs: Long = 0L,
+    val sourceOutMs: Long = Long.MAX_VALUE,
+)
+
 /**
  * Kdenlive-inspired Android workspace shell.
  * This is the first UI port layer; editing actions are connected to the native
@@ -52,13 +61,32 @@ fun KdenliveWorkspaceScreen(
     var playing by remember { mutableStateOf(false) }
     var selectedClip by remember { mutableStateOf("Clip 01") }
     var selectedMedia by remember { mutableStateOf<Uri?>(null) }
+    var timelineClips by remember { mutableStateOf<List<KdTimelineClip>>(emptyList()) }
+    var selectedTimelineClipId by remember { mutableStateOf<Long?>(null) }
+    var playheadMs by remember { mutableLongStateOf(0L) }
+    var clipIdCounter by remember { mutableLongStateOf(1L) }
     val context = LocalContext.current
     val player = remember(context) { ExoPlayer.Builder(context).build() }
     val selectedMediaType = remember(selectedMedia) { selectedMedia?.let { context.contentResolver.getType(it) }.orEmpty() }
     DisposableEffect(player) { onDispose { player.release() } }
-    LaunchedEffect(mediaUris) { if (selectedMedia !in mediaUris) selectedMedia = mediaUris.firstOrNull() }
+    LaunchedEffect(mediaUris) {
+        val existing = timelineClips.map { it.uri }.toSet()
+        val added = mediaUris.filterNot { it in existing }.map { uri ->
+            KdTimelineClip(clipIdCounter++, uri, uri.lastPathSegment?.substringAfterLast('/')?.takeLast(20) ?: "Media")
+        }
+        if (added.isNotEmpty()) timelineClips = timelineClips + added
+        if (selectedMedia !in mediaUris) selectedMedia = mediaUris.firstOrNull()
+    }
+    LaunchedEffect(player, playing) {
+        while (playing) {
+            delay(120)
+            playheadMs = player.currentPosition.coerceAtLeast(0L)
+            if (!player.isPlaying) playing = false
+        }
+    }
     LaunchedEffect(selectedMedia) {
         player.stop()
+        playheadMs = 0L
         if (!selectedMediaType.startsWith("image/")) selectedMedia?.let { player.setMediaItem(MediaItem.fromUri(it)); player.prepare() }
     }
 
@@ -142,10 +170,10 @@ fun KdenliveWorkspaceScreen(
                 }
                 Row(Modifier.fillMaxWidth().height(42.dp).background(KdPanel).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { if (player.isPlaying) player.pause() else player.play(); playing = player.isPlaying }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = KdText) }
-                    Icon(Icons.Default.SkipPrevious, null, tint = KdMuted, modifier = Modifier.size(19.dp))
-                    Icon(Icons.Default.SkipNext, null, tint = KdMuted, modifier = Modifier.size(19.dp))
+                    IconButton(onClick = { player.seekTo(0); playheadMs = 0L }) { Icon(Icons.Default.SkipPrevious, null, tint = KdMuted) }
+                    IconButton(onClick = { player.seekTo((player.duration.takeIf { it > 0 } ?: 0L)); playheadMs = player.currentPosition }) { Icon(Icons.Default.SkipNext, null, tint = KdMuted) }
                     Spacer(Modifier.weight(1f))
-                    Text("00:00:00:00", color = KdText, fontSize = 11.sp)
+                    Text(formatTimecode(playheadMs), color = KdText, fontSize = 11.sp)
                 }
             }
             Column(Modifier.weight(0.26f).fillMaxHeight().background(KdPanel, RoundedCornerShape(5.dp))) {
@@ -171,8 +199,21 @@ fun KdenliveWorkspaceScreen(
                         modifier = Modifier.clickable { selectedTool = tool }.padding(horizontal = 7.dp, vertical = 5.dp))
                 }
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Default.Remove, null, tint = KdMuted, modifier = Modifier.size(16.dp))
-                Icon(Icons.Default.Add, null, tint = KdMuted, modifier = Modifier.size(16.dp).padding(start = 4.dp))
+                TextButton(onClick = {
+                    val selected = timelineClips.firstOrNull { it.id == selectedTimelineClipId }
+                    val splitAt = playheadMs
+                    if (selected != null && splitAt > selected.sourceInMs && splitAt < selected.sourceOutMs) {
+                        val left = selected.copy(sourceOutMs = splitAt)
+                        val right = selected.copy(id = clipIdCounter++, sourceInMs = splitAt, label = selected.label + " (2)")
+                        val index = timelineClips.indexOfFirst { it.id == selected.id }
+                        timelineClips = timelineClips.toMutableList().also { it.removeAt(index); it.addAll(index, listOf(left, right)) }
+                        selectedTimelineClipId = right.id
+                    }
+                }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) { Text("Split", color = KdAccent, fontSize = 10.sp) }
+                TextButton(onClick = {
+                    timelineClips = timelineClips.filterNot { it.id == selectedTimelineClipId }
+                    selectedTimelineClipId = null
+                }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) { Text("Delete", color = Color(0xFFE57373), fontSize = 10.sp) }
             }
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Column(Modifier.width(76.dp).fillMaxHeight().background(Color(0xFF252930))) {
@@ -185,18 +226,21 @@ fun KdenliveWorkspaceScreen(
                 Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(5.dp)) {
                     repeat(4) { index ->
                         Box(Modifier.width(760.dp).weight(1f).border(0.5.dp, KdLine)) {
-                            if (index == 1 && mediaUris.isNotEmpty()) {
+                            if (index == 1 && timelineClips.isNotEmpty()) {
                                 Row(Modifier.fillMaxHeight().padding(start = 18.dp, top = 3.dp, bottom = 3.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    mediaUris.forEachIndexed { mediaIndex, uri ->
-                                        val label = uri.lastPathSegment?.substringAfterLast('/')?.takeLast(20) ?: "Media ${mediaIndex + 1}"
-                                        TimelineClip(label, Modifier.width(160.dp), selectedMedia == uri) {
-                                            selectedMedia = uri
-                                            selectedClip = label
+                                    timelineClips.forEach { clip ->
+                                        val selected = selectedTimelineClipId == clip.id
+                                        TimelineClip(clip.label, Modifier.width(160.dp), selected) {
+                                            selectedTimelineClipId = clip.id
+                                            selectedMedia = clip.uri
+                                            selectedClip = clip.label
+                                            player.seekTo(clip.sourceInMs)
+                                            playheadMs = clip.sourceInMs
                                         }
                                     }
                                 }
                             } else if (index == 1) {
-                                Text("Import media to populate the timeline", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
+                                Text("Import media, then select a clip", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
                             }
                         }
                     }
@@ -204,11 +248,20 @@ fun KdenliveWorkspaceScreen(
             }
         }
         Row(Modifier.fillMaxWidth().height(22.dp).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Ready", color = KdMuted, fontSize = 9.sp)
+            Text("Ready • ${timelineClips.size} timeline clips", color = KdMuted, fontSize = 9.sp)
             Spacer(Modifier.weight(1f))
             Text("ViTor Android • Kdenlive-inspired workspace", color = KdMuted, fontSize = 9.sp)
         }
     }
+}
+
+private fun formatTimecode(milliseconds: Long): String {
+    val totalSeconds = milliseconds.coerceAtLeast(0L) / 1000L
+    val hours = totalSeconds / 3600L
+    val minutes = (totalSeconds % 3600L) / 60L
+    val seconds = totalSeconds % 60L
+    val frames = (milliseconds.coerceAtLeast(0L) % 1000L) * 30L / 1000L
+    return "%02d:%02d:%02d:%02d".format(hours, minutes, seconds, frames)
 }
 
 @Composable
