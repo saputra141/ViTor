@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                         mediaUris = importedMedia,
                         onImportMedia = { mediaPicker.launch(arrayOf("video/*", "audio/*", "image/*")) },
                         onRemoveMedia = { uri -> importedMedia = importedMedia.filterNot { it == uri } },
-                        onBack = { projectId = null },
+                        onBack = { projectId = null; importedMedia = emptyList() },
                         onExport = { showExport = true },
                     )
                     else -> ProjectLibraryScreen(onOpenProject = { projectId = it })
