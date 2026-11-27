@@ -13,11 +13,10 @@ permissions:
 jobs:
   download-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Prepare download directory
-        shell: bash
-        run: mkdir -p downloads
+        run: mkdir -p downloads chunks
 
       - name: Download and verify Wine builds
         shell: bash
@@ -30,7 +29,7 @@ jobs:
           sha256sum -c <(grep -F 'wine-11.22-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
           sha256sum -c <(grep -F 'wine-11.22-staging-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
 
-      - name: Download Proton-compatible Wine build
+      - name: Download and verify Proton-compatible Wine
         shell: bash
         run: |
           set -euo pipefail
@@ -39,79 +38,250 @@ jobs:
           curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-proton-11.0-3-sha256sums.txt https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/sha256sums.txt
           sha256sum -c <(grep -F 'wine-proton-11.0-3-amd64-wow64.tar.xz' wine-proton-11.0-3-sha256sums.txt)
 
-      - name: Download official Gebang Editor installers
+      - name: Download official Gebang Editor Portable
         shell: bash
         run: |
           set -euo pipefail
           cd downloads
           curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o Gebang-Editor-Portable-0.1.27.exe https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Portable-0.1.27.exe
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o Gebang-Editor-Setup-0.1.27.exe https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Setup-0.1.27.exe
           test "$(stat -c '%s' Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
-          test "$(stat -c '%s' Gebang-Editor-Setup-0.1.27.exe)" = "358978104"
 
-      - name: Create provenance and SHA-256 manifest
+      - name: Split files into transfer-safe chunks
         shell: bash
         run: |
           set -euo pipefail
-          cd downloads
-          {
-            echo "Downloaded at UTC: $(date -u +%FT%TZ)"
-            echo "Source: official GitHub release assets"
-            echo
-            echo "Wine 11.22: https://github.com/Kron4ek/Wine-Builds/releases/tag/11.22"
-            echo "Wine Proton 11.0-3: https://github.com/Kron4ek/Wine-Builds/releases/tag/proton-11.0-3"
-            echo "Gebang Editor 0.1.27: https://github.com/gebangkiidiw/GebangEditor-Releases/releases/tag/v0.1.27"
-            echo
-            echo "SHA-256:"
-            sha256sum *.tar.xz *.exe
-            echo
-            echo "Sizes:"
-            ls -lh *.tar.xz *.exe
-          } > DOWNLOAD-MANIFEST.txt
+          split -b 90M -d -a 2 downloads/wine-11.22-amd64-wow64.tar.xz chunks/wine-stable-
+          split -b 90M -d -a 2 downloads/wine-11.22-staging-amd64-wow64.tar.xz chunks/wine-staging-
+          split -b 90M -d -a 2 downloads/wine-proton-11.0-3-amd64-wow64.tar.xz chunks/wine-proton-
+          split -b 90M -d -a 2 downloads/Gebang-Editor-Portable-0.1.27.exe chunks/gebang-portable-
+          cp downloads/wine-11.22-sha256sums.txt chunks/
+          cp downloads/wine-proton-11.0-3-sha256sums.txt chunks/
+          cp downloads/Gebang-Editor-Portable-0.1.27.exe.sha256 chunks/ 2>/dev/null || true
+          (cd downloads && sha256sum *.tar.xz *.exe) > chunks/SHA256SUMS-downloaded.txt
+          ls -lh chunks
 
-      - name: Upload Wine 11.22 builds
+      - name: Upload Wine stable chunk 0
         uses: actions/upload-artifact@v4
         with:
-          name: wine-11.22-builds
-          path: |
-            downloads/wine-11.22-amd64-wow64.tar.xz
-            downloads/wine-11.22-staging-amd64-wow64.tar.xz
-            downloads/wine-11.22-sha256sums.txt
-            downloads/DOWNLOAD-MANIFEST.txt
-          if-no-files-found: error
+          name: wine-stable-0
+          path: chunks/wine-stable-00
+          if-no-files-found: ignore
           compression-level: 0
           retention-days: 2
 
-      - name: Upload Proton-compatible Wine build
+      - name: Upload Wine staging chunk 0
         uses: actions/upload-artifact@v4
         with:
-          name: wine-proton-11.0-3
-          path: |
-            downloads/wine-proton-11.0-3-amd64-wow64.tar.xz
-            downloads/wine-proton-11.0-3-sha256sums.txt
-            downloads/DOWNLOAD-MANIFEST.txt
-          if-no-files-found: error
+          name: wine-staging-0
+          path: chunks/wine-staging-00
+          if-no-files-found: ignore
           compression-level: 0
           retention-days: 2
 
-      - name: Upload Gebang Editor Portable
+      - name: Upload Proton chunk 0
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-editor-portable-0.1.27
-          path: |
-            downloads/Gebang-Editor-Portable-0.1.27.exe
-            downloads/DOWNLOAD-MANIFEST.txt
-          if-no-files-found: error
+          name: wine-proton-0
+          path: chunks/wine-proton-00
+          if-no-files-found: ignore
           compression-level: 0
           retention-days: 2
 
-      - name: Upload Gebang Editor Setup
+      - name: Upload Gebang portable chunk 0
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-editor-setup-0.1.27
-          path: |
-            downloads/Gebang-Editor-Setup-0.1.27.exe
-            downloads/DOWNLOAD-MANIFEST.txt
-          if-no-files-found: error
+          name: gebang-portable-0
+          path: chunks/gebang-portable-00
+          if-no-files-found: ignore
           compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine stable chunk 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-stable-1
+          path: chunks/wine-stable-01
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine staging chunk 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-staging-1
+          path: chunks/wine-staging-01
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton chunk 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-1
+          path: chunks/wine-proton-01
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang portable chunk 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-portable-1
+          path: chunks/gebang-portable-01
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine stable chunk 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-stable-2
+          path: chunks/wine-stable-02
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine staging chunk 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-staging-2
+          path: chunks/wine-staging-02
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton chunk 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-2
+          path: chunks/wine-proton-02
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang portable chunk 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-portable-2
+          path: chunks/gebang-portable-02
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine stable chunk 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-stable-3
+          path: chunks/wine-stable-03
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine staging chunk 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-staging-3
+          path: chunks/wine-staging-03
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton chunk 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-3
+          path: chunks/wine-proton-03
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang portable chunk 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-portable-3
+          path: chunks/gebang-portable-03
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine stable chunk 4
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-stable-4
+          path: chunks/wine-stable-04
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine staging chunk 4
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-staging-4
+          path: chunks/wine-staging-04
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton chunk 4
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-4
+          path: chunks/wine-proton-04
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang portable chunk 4
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-portable-4
+          path: chunks/gebang-portable-04
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine stable chunk 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-stable-5
+          path: chunks/wine-stable-05
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Wine staging chunk 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-staging-5
+          path: chunks/wine-staging-05
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton chunk 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-5
+          path: chunks/wine-proton-05
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang portable chunk 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-portable-5
+          path: chunks/gebang-portable-05
+          if-no-files-found: ignore
+          compression-level: 0
+          retention-days: 2
+      - name: Upload checksums and manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-checksums
+          path: |
+            chunks/SHA256SUMS-downloaded.txt
+            chunks/wine-11.22-sha256sums.txt
+            chunks/wine-proton-11.0-3-sha256sums.txt
+          if-no-files-found: error
           retention-days: 2
