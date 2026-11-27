@@ -1,0 +1,96 @@
+name: Temporary asset fetch - Wine and Gebang Editor
+
+on:
+  push:
+    branches:
+      - ops/fetch-wine-gebang-assets-20261127
+    paths:
+      - .github/workflows/temporary-fetch-assets.yml
+
+permissions:
+  contents: read
+
+jobs:
+  download-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Prepare download directory
+        shell: bash
+        run: mkdir -p downloads
+
+      - name: Download and verify Wine builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd downloads
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o wine-11.22-sha256sums.txt \
+            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/sha256sums.txt
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o wine-11.22-amd64-wow64.tar.xz \
+            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-amd64-wow64.tar.xz
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o wine-11.22-staging-amd64-wow64.tar.xz \
+            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-staging-amd64-wow64.tar.xz
+          grep -F 'wine-11.22-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt
+          grep -F 'wine-11.22-staging-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt
+          sha256sum -c <(grep -F 'wine-11.22-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
+          sha256sum -c <(grep -F 'wine-11.22-staging-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
+
+      - name: Download Proton-compatible Wine build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd downloads
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o wine-proton-11.0-3-amd64-wow64.tar.xz \
+            https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/wine-proton-11.0-3-amd64-wow64.tar.xz
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o wine-proton-11.0-3-sha256sums.txt \
+            https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/sha256sums.txt
+          grep -F 'wine-proton-11.0-3-amd64-wow64.tar.xz' wine-proton-11.0-3-sha256sums.txt
+          sha256sum -c <(grep -F 'wine-proton-11.0-3-amd64-wow64.tar.xz' wine-proton-11.0-3-sha256sums.txt)
+
+      - name: Download official Gebang Editor installers
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd downloads
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o Gebang-Editor-Portable-0.1.27.exe \
+            https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Portable-0.1.27.exe
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
+            -o Gebang-Editor-Setup-0.1.27.exe \
+            https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Setup-0.1.27.exe
+          test "$(stat -c '%s' Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
+          test "$(stat -c '%s' Gebang-Editor-Setup-0.1.27.exe)" = "358978104"
+
+      - name: Create provenance and SHA-256 manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd downloads
+          {
+            echo "Downloaded at UTC: $(date -u +%FT%TZ)"
+            echo "Source: official GitHub release assets"
+            echo
+            echo "Wine 11.22: https://github.com/Kron4ek/Wine-Builds/releases/tag/11.22"
+            echo "Wine Proton 11.0-3: https://github.com/Kron4ek/Wine-Builds/releases/tag/proton-11.0-3"
+            echo "Gebang Editor 0.1.27: https://github.com/gebangkiidiw/GebangEditor-Releases/releases/tag/v0.1.27"
+            echo
+            echo "SHA-256:"
+            sha256sum *.tar.xz *.exe
+            echo
+            echo "Sizes:"
+            ls -lh *.tar.xz *.exe
+          } > DOWNLOAD-MANIFEST.txt
+
+      - name: Upload downloaded assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-gebang-downloads
+          path: downloads/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
