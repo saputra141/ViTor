@@ -1,4 +1,4 @@
-name: Temporary assemble and test Gebang Editor
+name: Temporary Gebang binary diagnostics
 on:
   push:
     branches:
@@ -11,94 +11,101 @@ permissions:
   actions: read
 
 jobs:
-  assemble-and-test:
+  diagnose:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - name: Prepare folders
-        run: mkdir -p input assembled logs
+        run: mkdir -p input assembled logs extracted wine-runtime
 
-      - name: Download verified transfer artifacts from previous run
+      - name: Download verified transfer artifacts
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
           set -euo pipefail
           gh run download 45920868698 --repo saputra141/ViTor --dir input
-          find input -maxdepth 2 -type f -printf '%p %s bytes\n' | sort
 
-      - name: Reassemble Wine and Gebang files
+      - name: Reassemble original files
         shell: bash
         run: |
           set -euo pipefail
           join_chunks() {
-            local artifact_prefix="$1"
-            local output="$2"
-            find "input/$artifact_prefix" -type f -print0 | sort -z | xargs -0 cat > "assembled/$output"
-            test -s "assembled/$output"
+            find "input/$1" -type f -print0 | sort -z | xargs -0 cat > "assembled/$2"
+            test -s "assembled/$2"
           }
           join_chunks wine-stable-0 wine-stable.part0
           join_chunks wine-stable-1 wine-stable.part1
           cat assembled/wine-stable.part0 assembled/wine-stable.part1 > assembled/wine-11.22-amd64-wow64.tar.xz
-
-          join_chunks wine-staging-0 wine-staging.part0
-          join_chunks wine-staging-1 wine-staging.part1
+          for i in 0 1; do join_chunks "wine-staging-$i" "wine-staging.part$i"; done
           cat assembled/wine-staging.part0 assembled/wine-staging.part1 > assembled/wine-11.22-staging-amd64-wow64.tar.xz
-
           join_chunks wine-proton-0 wine-proton.part0
-          cat assembled/wine-proton.part0 > assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
-
+          cp assembled/wine-proton.part0 assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
           for i in 0 1 2 3; do join_chunks "gebang-portable-$i" "gebang-$i.part"; done
           cat assembled/gebang-{0,1,2,3}.part > assembled/Gebang-Editor-Portable-0.1.27.exe
-
-          wc -c assembled/*
-          file assembled/Gebang-Editor-Portable-0.1.27.exe
-          xz -t assembled/wine-11.22-amd64-wow64.tar.xz
-          xz -t assembled/wine-11.22-staging-amd64-wow64.tar.xz
-          xz -t assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
           test "$(stat -c '%s' assembled/Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
-          sha256sum assembled/*.tar.xz assembled/*.exe
+          sha256sum assembled/*.tar.xz assembled/*.exe | tee logs/sha256.txt
+          xz -t assembled/*.tar.xz
 
-      - name: Install Wine runtime dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb xauth cabextract winbind libfuse2
-
-      - name: Extract Wine and verify runtime
+      - name: Inspect Gebang executable payload
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p wine-runtime
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full file binutils
+          file assembled/Gebang-Editor-Portable-0.1.27.exe | tee logs/file-type.txt
+          7z l assembled/Gebang-Editor-Portable-0.1.27.exe > logs/archive-list.txt 2>&1 || true
+          7z x -y -oextracted assembled/Gebang-Editor-Portable-0.1.27.exe > logs/archive-extract.txt 2>&1 || true
+          find extracted -type f -printf '%p %s bytes\n' | sort > logs/extracted-files.txt
+          find extracted -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.node' \) -print0 | xargs -0 -r file > logs/payload-binaries.txt
+          grep -Eio 'electron|chromium|qt[0-9]?|unity|unreal|godot|dotnet|\.net|webview2|nsis|inno setup' logs/archive-list.txt | sort -u > logs/technology-hints.txt || true
+          sed -n '1,160p' logs/extracted-files.txt
+
+      - name: Install diagnostic runtime dependencies
+        run: |
+          sudo apt-get install -y xvfb xauth cabextract winbind libfuse2 imagemagick xdotool wmctrl
+
+      - name: Extract and verify Wine
+        shell: bash
+        run: |
+          set -euo pipefail
           tar -xJf assembled/wine-11.22-amd64-wow64.tar.xz -C wine-runtime
           WINEBIN="$(find "$PWD/wine-runtime" -type f -path '*/bin/wine' | head -n 1)"
           test -x "$WINEBIN"
           echo "WINEBIN=$WINEBIN" >> "$GITHUB_ENV"
-          "$WINEBIN" --version
+          echo "WINEBIN=$WINEBIN" | tee logs/wine-path.txt
+          "$WINEBIN" --version | tee logs/wine-version.txt
+          ls -l "$(dirname "$WINEBIN")"/wine* > logs/wine-tools.txt
 
-      - name: Attempt Gebang Editor startup under Wine
+      - name: Run Wine and capture GUI diagnostics
         shell: bash
         continue-on-error: true
         run: |
           set +e
-          export WINEPREFIX="$PWD/wineprefix"
-          export WINEDEBUG=-all
-          xvfb-run -a timeout 120s "$WINEBIN" wineboot -u > logs/wineboot.log 2>&1
-          BOOT=$?
-          xvfb-run -a timeout 180s "$WINEBIN" assembled/Gebang-Editor-Portable-0.1.27.exe > logs/gebang-startup.log 2>&1
-          APP=$?
-          printf 'wineboot_exit=%s\napp_exit=%s\n' "$BOOT" "$APP" | tee logs/test-result.txt
-          cat logs/gebang-startup.log || true
-          if [ "$APP" -eq 0 ]; then echo "Gebang process exited normally."; fi
-          if [ "$APP" -eq 124 ]; then echo "Gebang remained running until timeout; this can indicate a live GUI process."; fi
+          export PATH="$(dirname "$WINEBIN"):$PATH"
+          export WINEPREFIX="$PWD/wineprefix-diagnostic"
+          export WINEDEBUG=+err,+warn
+          xvfb-run -a bash -c '
+            mkdir -p logs
+            timeout 180s "$WINEBIN" wineboot -u > logs/wineboot.log 2>&1
+            echo "wineboot_exit=$?" | tee logs/exit-codes.txt
+            (timeout 150s "$WINEBIN" "$PWD/assembled/Gebang-Editor-Portable-0.1.27.exe" > logs/gebang-startup.log 2>&1) &
+            APP_PID=$!
+            echo "app_pid=$APP_PID" >> logs/exit-codes.txt
+            sleep 45
+            import -window root logs/desktop-45s.png 2> logs/screenshot-error.txt
+            wmctrl -lp > logs/windows.txt 2>&1
+            xdotool search --onlyvisible --name "." getwindowname %@ > logs/window-titles.txt 2>&1
+            ps -ef | grep -Ei "wine|gebang|explorer|services.exe" | grep -v grep > logs/processes.txt
+            wait "$APP_PID"
+            echo "app_exit=$?" >> logs/exit-codes.txt
+          '
+          echo "Diagnostic command finished."
 
-      - name: Save test evidence
+      - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-wine-test-evidence
-          path: |
-            logs/
-            assembled/*.exe
-            assembled/*.tar.xz
+          name: gebang-binary-diagnostics
+          path: logs/
           if-no-files-found: warn
-          retention-days: 2
+          retention-days: 3
