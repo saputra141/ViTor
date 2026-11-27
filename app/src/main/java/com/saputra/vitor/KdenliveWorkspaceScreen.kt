@@ -11,6 +11,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import android.net.Uri
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,11 +42,22 @@ fun KdenliveWorkspaceScreen(
     projectId: String,
     onBack: () -> Unit,
     onExport: () -> Unit,
+    mediaUris: List<Uri> = emptyList(),
+    onImportMedia: () -> Unit = {},
 ) {
     var selectedTab by remember { mutableStateOf("Project Bin") }
     var selectedTool by remember { mutableStateOf("Select") }
     var playing by remember { mutableStateOf(false) }
     var selectedClip by remember { mutableStateOf("Clip 01") }
+    var selectedMedia by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val player = remember(context) { ExoPlayer.Builder(context).build() }
+    DisposableEffect(player) { onDispose { player.release() } }
+    LaunchedEffect(mediaUris) { if (selectedMedia == null && mediaUris.isNotEmpty()) selectedMedia = mediaUris.first() }
+    LaunchedEffect(selectedMedia) {
+        player.stop()
+        selectedMedia?.let { player.setMediaItem(MediaItem.fromUri(it)); player.prepare() }
+    }
 
     Column(Modifier.fillMaxSize().background(KdBg)) {
         Row(
@@ -62,6 +79,7 @@ fun KdenliveWorkspaceScreen(
             }
             Spacer(Modifier.weight(1f))
             TextButton(onClick = onBack, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Projects", fontSize = 11.sp) }
+            TextButton(onClick = onImportMedia, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Import Media", fontSize = 11.sp) }
             Button(onClick = onExport, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp), colors = ButtonDefaults.buttonColors(containerColor = KdAccent)) {
                 Text("Render", fontSize = 11.sp, color = Color.Black)
             }
@@ -82,12 +100,17 @@ fun KdenliveWorkspaceScreen(
                 if (selectedTab == "Effects") {
                     listOf("Audio", "Blur and Sharpen", "Color Correction", "Crop and Transform", "Motion", "Stylize").forEach { PanelEntry(it) }
                 } else {
-                    PanelEntry("All clips")
-                    PanelEntry("Video 01.mp4")
-                    PanelEntry("Audio 01.wav")
-                    PanelEntry("Image 01.png")
+                    PanelEntry("All clips (${mediaUris.size})")
+                    mediaUris.forEachIndexed { index, uri ->
+                        val label = uri.lastPathSegment?.substringAfterLast('/')?.takeLast(28) ?: "Media ${index + 1}"
+                        Row(Modifier.fillMaxWidth().clickable { selectedMedia = uri; selectedClip = label }.padding(horizontal = 8.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Movie, null, tint = if (selectedMedia == uri) KdAccent else KdMuted, modifier = Modifier.size(15.dp))
+                            Spacer(Modifier.width(7.dp))
+                            Text(label, color = if (selectedMedia == uri) KdAccent else KdText, fontSize = 10.sp, maxLines = 1)
+                        }
+                    }
                     Spacer(Modifier.weight(1f))
-                    Text("Drag media to the timeline", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
+                    Text(if (mediaUris.isEmpty()) "Import video, audio or image files" else "Select media to preview", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
                 }
             }
             Column(Modifier.weight(0.48f).fillMaxHeight().background(Color(0xFF101216), RoundedCornerShape(5.dp))) {
@@ -97,14 +120,22 @@ fun KdenliveWorkspaceScreen(
                     Text("1920 × 1080  •  30 fps", color = KdMuted, fontSize = 9.sp)
                 }
                 Box(Modifier.fillMaxWidth().weight(1f).padding(12.dp).background(Color(0xFF050608)), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.Movie, null, tint = Color(0xFF414854), modifier = Modifier.size(42.dp))
-                        Text("Project Preview", color = Color(0xFF777F8C), fontSize = 12.sp)
-                        Text("Select a clip to preview", color = Color(0xFF555D68), fontSize = 9.sp)
+                    if (selectedMedia != null) {
+                        AndroidView(
+                            factory = { ctx -> PlayerView(ctx).apply { player = player; useController = true } },
+                            update = { it.player = player },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.Movie, null, tint = Color(0xFF414854), modifier = Modifier.size(42.dp))
+                            Text("Project Monitor", color = Color(0xFF777F8C), fontSize = 12.sp)
+                            Text("Import media to start preview", color = Color(0xFF555D68), fontSize = 9.sp)
+                        }
                     }
                 }
                 Row(Modifier.fillMaxWidth().height(42.dp).background(KdPanel).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { playing = !playing }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = KdText) }
+                    IconButton(onClick = { if (player.isPlaying) player.pause() else player.play(); playing = player.isPlaying }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = KdText) }
                     Icon(Icons.Default.SkipPrevious, null, tint = KdMuted, modifier = Modifier.size(19.dp))
                     Icon(Icons.Default.SkipNext, null, tint = KdMuted, modifier = Modifier.size(19.dp))
                     Spacer(Modifier.weight(1f))
