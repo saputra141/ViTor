@@ -68,6 +68,40 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
             notice = "Media ditambahkan: $name"
         }
     }
+    val openProject = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                val json = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    ?: error("Tidak bisa membaca file proyek")
+                val root = JSONObject(json)
+                require(root.optString("format") == "vitor-android-project") { "Format proyek tidak dikenal" }
+                val loadedMedia = mutableListOf<WorkspaceMedia>()
+                val mediaJson = root.optJSONArray("media") ?: JSONArray()
+                for (i in 0 until mediaJson.length()) {
+                    val item = mediaJson.getJSONObject(i)
+                    val mediaUri = Uri.parse(item.getString("uri"))
+                    context.contentResolver.openFileDescriptor(mediaUri, "r")?.close()
+                    loadedMedia.add(WorkspaceMedia(mediaUri, item.optString("name", "Media " + (i + 1))))
+                }
+                val byUri = loadedMedia.associateBy { it.uri.toString() }
+                val loadedClips = mutableListOf<TimelineClip>()
+                val timelineJson = root.optJSONArray("timeline") ?: JSONArray()
+                for (i in 0 until timelineJson.length()) {
+                    val item = timelineJson.getJSONObject(i)
+                    val clipMedia = byUri[item.getString("mediaUri")] ?: continue
+                    loadedClips.add(TimelineClip(item.optInt("id", i + 1), clipMedia, item.optLong("startMs", 0L), item.optLong("endMs", 0L)))
+                }
+                media.clear()
+                media.addAll(loadedMedia)
+                timelineClips.clear()
+                timelineClips.addAll(loadedClips)
+                nextClipId = (loadedClips.maxOfOrNull { it.id } ?: 0) + 1
+                selectedClipId = loadedClips.firstOrNull()?.id ?: -1
+                selected = loadedClips.firstOrNull()?.media ?: loadedMedia.firstOrNull()
+                notice = "Proyek ViTor dibuka: " + loadedClips.size + " klip."
+            }.onFailure { notice = "Gagal membuka proyek: " + (it.message ?: "kesalahan tidak diketahui") }
+        }
+    }
     val saveProject = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri != null) {
             runCatching {
@@ -132,6 +166,7 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                 Spacer(Modifier.weight(1f))
                 ToolbarAction(Icons.Default.Undo, "Undo") { notice = "Undo belum tersedia pada engine Android." }
                 ToolbarAction(Icons.Default.Redo, "Redo") { notice = "Redo belum tersedia pada engine Android." }
+                ToolbarAction(Icons.Default.FolderOpen, "Buka proyek") { openProject.launch(arrayOf("application/json", "text/*")) }
                 ToolbarAction(Icons.Default.Save, "Simpan") { saveProject.launch("Gebang-Project.json") }
                 Spacer(Modifier.width(4.dp))
                 Button(
