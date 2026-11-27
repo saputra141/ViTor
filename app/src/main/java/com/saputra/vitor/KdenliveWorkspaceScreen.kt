@@ -16,6 +16,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import coil.compose.AsyncImage
 import android.net.Uri
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,11 +53,12 @@ fun KdenliveWorkspaceScreen(
     var selectedMedia by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val player = remember(context) { ExoPlayer.Builder(context).build() }
+    val selectedMediaType = remember(selectedMedia) { selectedMedia?.let { context.contentResolver.getType(it) }.orEmpty() }
     DisposableEffect(player) { onDispose { player.release() } }
     LaunchedEffect(mediaUris) { if (selectedMedia == null && mediaUris.isNotEmpty()) selectedMedia = mediaUris.first() }
     LaunchedEffect(selectedMedia) {
         player.stop()
-        selectedMedia?.let { player.setMediaItem(MediaItem.fromUri(it)); player.prepare() }
+        if (!selectedMediaType.startsWith("image/")) selectedMedia?.let { player.setMediaItem(MediaItem.fromUri(it)); player.prepare() }
     }
 
     Column(Modifier.fillMaxSize().background(KdBg)) {
@@ -120,7 +122,9 @@ fun KdenliveWorkspaceScreen(
                     Text("1920 × 1080  •  30 fps", color = KdMuted, fontSize = 9.sp)
                 }
                 Box(Modifier.fillMaxWidth().weight(1f).padding(12.dp).background(Color(0xFF050608)), contentAlignment = Alignment.Center) {
-                    if (selectedMedia != null) {
+                    if (selectedMediaType.startsWith("image/")) {
+                        AsyncImage(model = selectedMedia, contentDescription = "Selected image", modifier = Modifier.fillMaxSize())
+                    } else if (selectedMedia != null) {
                         AndroidView(
                             factory = { ctx -> PlayerView(ctx).apply { this.player = player; useController = true } },
                             update = { it.player = player },
