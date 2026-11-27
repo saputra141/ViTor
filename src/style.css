@@ -1,0 +1,233 @@
+:root {
+  --bg-dark: #232629;
+  --bg-sidebar: #31363b;
+  --bg-track: #2a2e32;
+  --text-main: #eff0f1;
+  --text-muted: #bdc3c7;
+  --accent: #3daee9;
+  --accent-hover: #1d99f3;
+  --border: #444a4e;
+  --timeline-header-width: 120px;
+  --track-height: 50px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto 1fr 300px;
+  grid-template-areas:
+    "nav"
+    "toolbar"
+    "workspace"
+    "timeline";
+}
+
+/* Navigation and Toolbars */
+.ui-header {
+  grid-area: nav;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  gap: 20px;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.menu-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.nav-btn:hover {
+  background: var(--bg-lighter, #4d5057);
+}
+
+.toolbar {
+  grid-area: toolbar;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 6px 12px;
+  gap: 15px;
+}
+
+/* Workspace Layout */
+.workspace {
+  grid-area: workspace;
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  overflow: hidden;
+}
+
+.panel {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  background: var(--bg-sidebar);
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+
+.content-area {
+  flex: 1;
+  padding: 10px;
+  background: #1b1e20;
+  overflow-y: auto;
+}
+
+/* Timeline Styling */
+.timeline-container {
+  grid-area: timeline;
+  background: var(--bg-dark);
+  border-top: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.timeline-controls {
+  height: 35px;
+  background: var(--bg-sidebar);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.timeline-scroll-area {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.track {
+  display: flex;
+  height: var(--track-height);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-track);
+}
+
+.track-header {
+  width: var(--timeline-header-width);
+  min-width: var(--timeline-header-width);
+  background: var(--bg-sidebar);
+  border-right: 2px solid var(--accent);
+  padding: 5px;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.track-content {
+  flex: 1;
+  position: relative;
+  background-image: linear-gradient(to right, var(--border) 1px, transparent 1px);
+  background-size: 50px 100%; /* Represents time increments */
+}
+
+/* Draggable Clips */
+.clip {
+  position: absolute;
+  height: calc(var(--track-height) - 10px);
+  top: 5px;
+  background: var(--accent);
+  border: 1px solid #ffffff33;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  cursor: grab;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.clip:active {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+.clip.audio {
+  background: #27ae60;
+}
+
+/* Range Sliders & UI Elements */
+input[type="range"] {
+  appearance: none;
+  background: var(--border);
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #f44336;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.playhead::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -5px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #f44336;
+}
