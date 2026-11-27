@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   download-assets:
@@ -284,4 +285,84 @@ jobs:
             chunks/wine-11.22-sha256sums.txt
             chunks/wine-proton-11.0-3-sha256sums.txt
           if-no-files-found: error
+          retention-days: 2
+
+  assemble-and-test:
+    needs: download-assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Download chunks from this workflow run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input assembled logs
+          gh run download "$GITHUB_RUN_ID" --repo saputra141/ViTor --dir input
+          find input -maxdepth 2 -type f -printf '%p %s bytes\\n' | sort
+
+      - name: Reassemble and verify packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          join_chunks() {
+            local prefix="$1" output="$2"
+            find "input/$prefix" -type f -print0 | sort -z | xargs -0 cat > "assembled/$output"
+            test -s "assembled/$output"
+          }
+          join_chunks wine-stable-0 stable0
+          join_chunks wine-stable-1 stable1
+          cat assembled/stable0 assembled/stable1 > assembled/wine-11.22-amd64-wow64.tar.xz
+          join_chunks wine-staging-0 staging0
+          join_chunks wine-staging-1 staging1
+          cat assembled/staging0 assembled/staging1 > assembled/wine-11.22-staging-amd64-wow64.tar.xz
+          join_chunks wine-proton-0 proton0
+          cat assembled/proton0 > assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
+          for i in 0 1 2 3; do join_chunks "gebang-portable-$i" "gebang$i"; done
+          cat assembled/gebang{0,1,2,3} > assembled/Gebang-Editor-Portable-0.1.27.exe
+          test "$(stat -c '%s' assembled/Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
+          xz -t assembled/wine-11.22-amd64-wow64.tar.xz
+          xz -t assembled/wine-11.22-staging-amd64-wow64.tar.xz
+          xz -t assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
+          file assembled/Gebang-Editor-Portable-0.1.27.exe
+          sha256sum assembled/*.tar.xz assembled/*.exe | tee logs/reassembled-sha256.txt
+          sha256sum -c input/asset-checksums/SHA256SUMS-downloaded.txt
+
+      - name: Install graphical runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xauth cabextract winbind libfuse2
+
+      - name: Extract Wine and check version
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir wine-runtime
+          tar -xJf assembled/wine-11.22-amd64-wow64.tar.xz -C wine-runtime
+          WINEBIN="$(find "$PWD/wine-runtime" -type f -path '*/bin/wine' | head -n 1)"
+          test -x "$WINEBIN"
+          echo "WINEBIN=$WINEBIN" >> "$GITHUB_ENV"
+          "$WINEBIN" --version
+
+      - name: Smoke test Gebang Editor under virtual display
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          export WINEPREFIX="$PWD/wineprefix"
+          export WINEDEBUG=-all
+          xvfb-run -a timeout 120s "$WINEBIN" wineboot -u > logs/wineboot.log 2>&1
+          echo "wineboot_exit=$?" | tee logs/wine-smoke-result.txt
+          xvfb-run -a timeout 180s "$WINEBIN" assembled/Gebang-Editor-Portable-0.1.27.exe > logs/gebang-startup.log 2>&1
+          echo "gebang_exit=$?" | tee -a logs/wine-smoke-result.txt
+          cat logs/gebang-startup.log || true
+
+      - name: Upload reassembly and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-wine-test-evidence
+          path: |
+            logs/
+            assembled/*.exe
+          if-no-files-found: warn
           retention-days: 2
