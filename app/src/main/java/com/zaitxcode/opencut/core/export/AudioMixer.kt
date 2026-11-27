@@ -95,7 +95,7 @@ class AudioMixer(private val context: Context) {
     private fun audioPlans(project: Project): List<AudioPlan> {
         val plans = mutableListOf<AudioPlan>()
         for (track in project.tracks) {
-            if (track.type != com.zaitxcode.opencut.core.model.TrackType.AUDIO) continue
+            if (track.type != com.zaitxcode.opencut.core.model.TrackType.AUDIO || track.muted) continue
             for (segment in track.segments) {
                 if (segment.muted) continue
                 val material = project.materials.find(segment.materialId) ?: continue
@@ -141,6 +141,7 @@ class AudioMixer(private val context: Context) {
         extractor.selectTrack(trackIndex)
 
         val sourceRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+        val sourceChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
         val codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
         codec.configure(format, null, null, 0)
         codec.start()
@@ -190,7 +191,17 @@ class AudioMixer(private val context: Context) {
         extractor.release()
 
         val raw = ShortArray(output.size) { output[it] }
-        if (sourceRate == sampleRate) raw else resample(raw, sourceRate)
+        // The mixer works in stereo. Duplicate mono sources and downmix wider
+        // layouts by taking their first two channels instead of misreading samples.
+        val sourceFrames = raw.size / sourceChannels
+        val stereo = ShortArray(sourceFrames * channels)
+        for (frame in 0 until sourceFrames) {
+            val left = raw[frame * sourceChannels]
+            val right = if (sourceChannels > 1) raw[frame * sourceChannels + 1] else left
+            stereo[frame * channels] = left
+            stereo[frame * channels + 1] = right
+        }
+        if (sourceRate == sampleRate) stereo else resample(stereo, sourceRate)
     }.getOrNull()
 
     /** Linear resampling of interleaved 16 bit PCM. */
