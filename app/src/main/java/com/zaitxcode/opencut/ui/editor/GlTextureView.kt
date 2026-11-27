@@ -106,7 +106,12 @@ private class RenderThread(
     }
 
     override fun run() {
-        if (!createContext()) return
+        if (!createContext()) {
+            // createContext may have initialized only part of EGL; tear down
+            // whichever handles were acquired before reporting the failed surface.
+            releaseContext()
+            return
+        }
         try {
             renderer.onSurfaceCreated(null, null)
             renderer.onSurfaceChanged(null, surfaceWidth, surfaceHeight)
