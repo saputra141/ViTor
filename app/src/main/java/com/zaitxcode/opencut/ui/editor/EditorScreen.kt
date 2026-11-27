@@ -77,14 +77,12 @@ fun EditorScreen(
             canUndo = canUndo,
             canRedo = canRedo,
             onBack = {
-                viewModel.save()
-                onBack()
+                viewModel.save(onBack)
             },
             onUndo = viewModel::undo,
             onRedo = viewModel::redo,
             onExport = {
-                viewModel.save()
-                onExport()
+                viewModel.save(onExport)
             },
         )
 
