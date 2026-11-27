@@ -1,9 +1,12 @@
 package com.saputra.vitor
 
 import android.os.Bundle
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
@@ -21,6 +24,11 @@ class MainActivity : ComponentActivity() {
             )) {
                 var projectId by remember { mutableStateOf<String?>(null) }
                 var showExport by remember { mutableStateOf(false) }
+                var importedMedia by remember { mutableStateOf<List<Uri>>(emptyList()) }
+                val mediaPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+                    uris.forEach { uri -> runCatching { contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
+                    importedMedia = (importedMedia + uris).distinct()
+                }
 
                 BackHandler(enabled = showExport || projectId != null) {
                     if (showExport) showExport = false else projectId = null
@@ -33,6 +41,8 @@ class MainActivity : ComponentActivity() {
                     )
                     projectId != null -> KdenliveWorkspaceScreen(
                         projectId = projectId!!,
+                        mediaUris = importedMedia,
+                        onImportMedia = { mediaPicker.launch(arrayOf("video/*", "audio/*", "image/*")) },
                         onBack = { projectId = null },
                         onExport = { showExport = true },
                     )
