@@ -272,8 +272,15 @@ class ExportEngine(private val context: Context) {
 
         encoder.stop()
         encoder.release()
-        egl.release()
         decoders.values.forEach { runCatching { it.release() } }
+        if (textures.isNotEmpty()) {
+            GLES20.glDeleteTextures(textures.size, textures.values.toIntArray(), 0)
+        }
+        if (lutTextures.isNotEmpty()) {
+            GLES20.glDeleteTextures(lutTextures.size, lutTextures.values.toIntArray(), 0)
+        }
+        composer.release()
+        egl.release()
 
         // ------------------------------------------------------------- audio --
         if (muxerStarted && encodedAudio != null) {
