@@ -234,6 +234,8 @@ class VideoDecoder(
         extractor = null
         surfaceTexture = null
         surface = null
+        // The decoder's external texture belongs to the current GL context.
+        GLES20.glDeleteTextures(1, intArrayOf(textureId), 0)
     }
 
     // ------------------------------------------------------------------ gl ---
