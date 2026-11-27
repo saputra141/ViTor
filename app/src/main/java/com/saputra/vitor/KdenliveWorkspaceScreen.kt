@@ -45,6 +45,7 @@ fun KdenliveWorkspaceScreen(
     onExport: () -> Unit,
     mediaUris: List<Uri> = emptyList(),
     onImportMedia: () -> Unit = {},
+    onRemoveMedia: (Uri) -> Unit = {},
 ) {
     var selectedTab by remember { mutableStateOf("Project Bin") }
     var selectedTool by remember { mutableStateOf("Select") }
@@ -55,7 +56,7 @@ fun KdenliveWorkspaceScreen(
     val player = remember(context) { ExoPlayer.Builder(context).build() }
     val selectedMediaType = remember(selectedMedia) { selectedMedia?.let { context.contentResolver.getType(it) }.orEmpty() }
     DisposableEffect(player) { onDispose { player.release() } }
-    LaunchedEffect(mediaUris) { if (selectedMedia == null && mediaUris.isNotEmpty()) selectedMedia = mediaUris.first() }
+    LaunchedEffect(mediaUris) { if (selectedMedia !in mediaUris) selectedMedia = mediaUris.firstOrNull() }
     LaunchedEffect(selectedMedia) {
         player.stop()
         if (!selectedMediaType.startsWith("image/")) selectedMedia?.let { player.setMediaItem(MediaItem.fromUri(it)); player.prepare() }
@@ -105,10 +106,11 @@ fun KdenliveWorkspaceScreen(
                     PanelEntry("All clips (${mediaUris.size})")
                     mediaUris.forEachIndexed { index, uri ->
                         val label = uri.lastPathSegment?.substringAfterLast('/')?.takeLast(28) ?: "Media ${index + 1}"
-                        Row(Modifier.fillMaxWidth().clickable { selectedMedia = uri; selectedClip = label }.padding(horizontal = 8.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().clickable { selectedMedia = uri; selectedClip = label }.padding(start = 8.dp, end = 4.dp, top = 5.dp, bottom = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Movie, null, tint = if (selectedMedia == uri) KdAccent else KdMuted, modifier = Modifier.size(15.dp))
                             Spacer(Modifier.width(7.dp))
-                            Text(label, color = if (selectedMedia == uri) KdAccent else KdText, fontSize = 10.sp, maxLines = 1)
+                            Text(label, color = if (selectedMedia == uri) KdAccent else KdText, fontSize = 10.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                            Icon(Icons.Default.Close, contentDescription = "Remove media", tint = KdMuted, modifier = Modifier.size(15.dp).clickable { onRemoveMedia(uri) })
                         }
                     }
                     Spacer(Modifier.weight(1f))
