@@ -62,6 +62,19 @@ class FrameComposer {
         lutTexture = GlUtil.createLutTexture()
     }
 
+
+    /** Releases GL programs and the fallback LUT. Must run with this GL context current. */
+    fun release() {
+        externalProgram?.let { GLES20.glDeleteProgram(it.id) }
+        plainProgram?.let { GLES20.glDeleteProgram(it.id) }
+        externalProgram = null
+        plainProgram = null
+        if (lutTexture != 0) {
+            GLES20.glDeleteTextures(1, intArrayOf(lutTexture), 0)
+            lutTexture = 0
+        }
+    }
+
     /** Clears the framebuffer with the canvas background colour. */
     fun clear(backgroundColor: Int) {
         GLES20.glClearColor(
