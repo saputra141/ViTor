@@ -6,6 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 /**
  * On-disk storage for projects.
@@ -24,7 +27,13 @@ class ProjectStore(context: Context) {
         encodeDefaults = true
     }
 
-    fun projectDir(projectId: String): File = File(root, projectId)
+    fun projectDir(projectId: String): File {
+        require(
+            projectId.matches(Regex("[A-Za-z0-9._-]{1,128}")) &&
+                projectId != "." && projectId != ".."
+        ) { "Invalid project id" }
+        return File(root, projectId)
+    }
 
     fun projectFile(projectId: String): File = File(projectDir(projectId), "project.json")
 
@@ -51,11 +60,18 @@ class ProjectStore(context: Context) {
         val tmp = File(dir, "project.json.tmp")
         runCatching {
             tmp.writeText(json.encodeToString(Project.serializer(), project))
-            tmp.renameTo(target) || run {
-                target.delete()
-                tmp.renameTo(target)
+            try {
+                Files.move(
+                    tmp.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING,
+                )
+            } catch (_: AtomicMoveNotSupportedException) {
+                Files.move(tmp.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
-        }.isSuccess
+            true
+        }.getOrDefault(false)
     }
 
     suspend fun deleteProject(projectId: String): Boolean = withContext(Dispatchers.IO) {
