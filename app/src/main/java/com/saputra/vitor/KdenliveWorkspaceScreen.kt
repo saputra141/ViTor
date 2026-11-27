@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import android.net.Uri
@@ -44,6 +45,7 @@ fun KdenliveWorkspaceScreen(
     onRemoveMedia: (Uri) -> Unit = {},
     editorViewModel: EditorViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
     var selectedTool by remember { mutableStateOf<Tool?>(Tool.MEDIA) }
     var selectedTab by remember { mutableStateOf("Project Bin") }
     var loadedProjectId by remember { mutableStateOf<String?>(null) }
@@ -58,7 +60,6 @@ fun KdenliveWorkspaceScreen(
 
     LaunchedEffect(projectId, mediaUris) {
         if (loadedProjectId != projectId) {
-            val context = androidx.compose.ui.platform.LocalContext.current
             val existing = (context.applicationContext as ViTorApplication).projectStore.readProject(projectId)
             editorViewModel.open(existing ?: newProject("ViTor Project").copy(id = projectId))
             loadedProjectId = projectId
@@ -140,7 +141,6 @@ fun KdenliveWorkspaceScreen(
                                 Icon(Icons.Default.Movie, null, tint = KdAccent, modifier = Modifier.size(14.dp))
                                 Spacer(Modifier.width(6.dp))
                                 Text(material.name, color = KdText, fontSize = 9.sp, maxLines = 1, modifier = Modifier.weight(1f))
-                                if (uri != null) Text("×", color = KdMuted, modifier = Modifier.clickable { onRemoveMedia(uri) })
                             }
                         }
                         if (materials.isEmpty()) Text("Import video, audio or images", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
