@@ -266,8 +266,12 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             val app = getApplication<Application>()
             val imported = withContext(Dispatchers.IO) {
                 uris.mapNotNull { uri ->
-                    val local = copyIntoStorage(app, uri)
-                    val info = MediaProbe.probe(app, local) ?: return@mapNotNull null
+                    val local = runCatching { copyIntoStorage(app, uri) }.getOrNull()
+                        ?: return@mapNotNull null
+                    val info = MediaProbe.probe(app, local) ?: run {
+                        if (local.scheme == "file") File(local.path.orEmpty()).delete()
+                        return@mapNotNull null
+                    }
                     val kind = when (info.kind) {
                         MediaKind.IMAGE -> MaterialKind.IMAGE
                         MediaKind.AUDIO -> MaterialKind.AUDIO
@@ -310,9 +314,9 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         val target = File(dir, UUID.randomUUID().toString() + "." + extension)
         app.contentResolver.openInputStream(uri)?.use { input ->
             target.outputStream().use { output -> input.copyTo(output) }
-        } ?: return uri
+        } ?: error("Cannot open selected media")
         Uri.fromFile(target)
-    }.getOrDefault(uri)
+    }.getOrThrow()
 
     /** Maps a mime type onto the file extension the decoders expect. */
     private fun extensionFor(mime: String): String? = when {
