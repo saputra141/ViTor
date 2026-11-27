@@ -21,9 +21,7 @@ jobs:
       - name: Download verified transfer artifacts
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          gh run download 45920868698 --repo saputra141/ViTor --dir input
+        run: gh run download 45920868698 --repo saputra141/ViTor --dir input
 
       - name: Reassemble original files
         shell: bash
@@ -58,11 +56,16 @@ jobs:
           find extracted -type f -printf '%p %s bytes\n' | sort > logs/extracted-files.txt
           find extracted -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.node' \) -print0 | xargs -0 -r file > logs/payload-binaries.txt
           grep -Eio 'electron|chromium|qt[0-9]?|unity|unreal|godot|dotnet|\.net|webview2|nsis|inno setup' logs/archive-list.txt | sort -u > logs/technology-hints.txt || true
-          sed -n '1,160p' logs/extracted-files.txt
+          {
+            echo '=== FILE TYPE ==='; cat logs/file-type.txt
+            echo '=== TECH HINTS ==='; cat logs/technology-hints.txt
+            echo '=== EXTRACTED FILES ==='; sed -n '1,240p' logs/extracted-files.txt
+            echo '=== BINARY TYPES ==='; sed -n '1,160p' logs/payload-binaries.txt
+            echo '=== ARCHIVE HEADER ==='; sed -n '1,100p' logs/archive-list.txt
+          } | tee logs/payload-summary.txt
 
       - name: Install diagnostic runtime dependencies
-        run: |
-          sudo apt-get install -y xvfb xauth cabextract winbind libfuse2 imagemagick xdotool wmctrl
+        run: sudo apt-get install -y xvfb xauth cabextract winbind libfuse2 imagemagick xdotool wmctrl
 
       - name: Extract and verify Wine
         shell: bash
@@ -74,38 +77,43 @@ jobs:
           echo "WINEBIN=$WINEBIN" >> "$GITHUB_ENV"
           echo "WINEBIN=$WINEBIN" | tee logs/wine-path.txt
           "$WINEBIN" --version | tee logs/wine-version.txt
-          ls -l "$(dirname "$WINEBIN")"/wine* > logs/wine-tools.txt
 
-      - name: Run Wine and capture GUI diagnostics
+      - name: Launch app directly with fresh Wine prefix
         shell: bash
         continue-on-error: true
         run: |
           set +e
           export PATH="$(dirname "$WINEBIN"):$PATH"
-          export WINEPREFIX="$PWD/wineprefix-diagnostic"
+          export WINEPREFIX="$PWD/wineprefix-direct"
           export WINEDEBUG=+err,+warn
-          xvfb-run -a bash -c '
+          xvfb-run -a -s "-screen 0 1440x900x24" bash -c '
             mkdir -p logs
-            timeout 180s "$WINEBIN" wineboot -u > logs/wineboot.log 2>&1
-            echo "wineboot_exit=$?" | tee logs/exit-codes.txt
-            (timeout 150s "$WINEBIN" "$PWD/assembled/Gebang-Editor-Portable-0.1.27.exe" > logs/gebang-startup.log 2>&1) &
+            echo "Launching Gebang directly; Wine will initialize prefix itself."
+            (timeout 240s "$WINEBIN" "$PWD/assembled/Gebang-Editor-Portable-0.1.27.exe" > logs/gebang-direct.log 2>&1) &
             APP_PID=$!
-            echo "app_pid=$APP_PID" >> logs/exit-codes.txt
-            sleep 45
-            import -window root logs/desktop-45s.png 2> logs/screenshot-error.txt
+            echo "app_pid=$APP_PID" > logs/direct-exit.txt
+            sleep 75
+            import -window root logs/desktop-direct-75s.png 2> logs/screenshot-error.txt
             wmctrl -lp > logs/windows.txt 2>&1
             xdotool search --onlyvisible --name "." getwindowname %@ > logs/window-titles.txt 2>&1
             ps -ef | grep -Ei "wine|gebang|explorer|services.exe" | grep -v grep > logs/processes.txt
             wait "$APP_PID"
-            echo "app_exit=$?" >> logs/exit-codes.txt
+            echo "app_exit=$?" >> logs/direct-exit.txt
           '
-          echo "Diagnostic command finished."
+          echo "Direct launch diagnostic completed."
+          {
+            echo '=== DIRECT EXIT ==='; cat logs/direct-exit.txt 2>/dev/null
+            echo '=== WINDOWS ==='; cat logs/windows.txt 2>/dev/null
+            echo '=== WINDOW TITLES ==='; cat logs/window-titles.txt 2>/dev/null
+            echo '=== PROCESSES ==='; cat logs/processes.txt 2>/dev/null
+            echo '=== APP LOG TAIL ==='; tail -n 160 logs/gebang-direct.log 2>/dev/null
+          } | tee logs/launch-summary.txt
 
       - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-binary-diagnostics
+          name: gebang-direct-launch-diagnostics
           path: logs/
           if-no-files-found: warn
           retention-days: 3
