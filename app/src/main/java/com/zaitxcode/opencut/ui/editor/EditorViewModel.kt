@@ -76,9 +76,18 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         get() = _selectedSegmentId.value?.let { id -> project.value.segment(id)?.second }
 
     fun open(project: Project) {
-        if (store != null) return
+        if (store?.project?.id == project.id) return
         store = EditorStore(project)
         _project.value = project
+        _playing.value = false
+        playJob?.cancel()
+        _playheadUs.value = 0L
+        _selectedSegmentId.value = null
+        _canUndo.value = false
+        _canRedo.value = false
+        _uris.value = project.materials.all.mapNotNull { material ->
+            material.path?.let { material.id to Uri.parse(it) }
+        }.toMap()
     }
 
     /** Loads a project from disk; falls back to a new project when it is missing. */
