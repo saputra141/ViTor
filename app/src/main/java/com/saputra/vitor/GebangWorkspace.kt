@@ -294,7 +294,30 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("TIMELINE", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Spacer(Modifier.width(10.dp))
-                            Text("${media.size} media", color = muted, fontSize = 9.sp)
+                            Text("${timelineClips.size} klip", color = muted, fontSize = 9.sp)
+                            TextButton(onClick = {
+                                val item = selected
+                                if (item == null) notice = "Pilih media terlebih dahulu."
+                                else {
+                                    val clip = TimelineClip(nextClipId++, item)
+                                    timelineClips.add(clip)
+                                    selectedClipId = clip.id
+                                    notice = "Klip ditambahkan ke VIDEO 1."
+                                }
+                            }, contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp)) {
+                                Text("+ Tambah klip", fontSize = 9.sp, color = accent)
+                            }
+                            TextButton(onClick = {
+                                val clip = timelineClips.firstOrNull { it.id == selectedClipId }
+                                if (clip == null) notice = "Pilih klip pada timeline untuk menghapus."
+                                else {
+                                    timelineClips.remove(clip)
+                                    selectedClipId = timelineClips.lastOrNull()?.id ?: -1
+                                    notice = "Klip dihapus dari timeline."
+                                }
+                            }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) {
+                                Text("Hapus", fontSize = 9.sp, color = Color(0xFFFF8C9B))
+                            }
                             Spacer(Modifier.weight(1f))
                             IconButton(onClick = { notice = "Zoom timeline belum tersedia." }, modifier = Modifier.size(24.dp)) {
                                 Icon(Icons.Default.ZoomOut, null, tint = muted, modifier = Modifier.size(15.dp))
@@ -303,7 +326,31 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                                 Icon(Icons.Default.ZoomIn, null, tint = muted, modifier = Modifier.size(15.dp))
                             }
                         }
-                        TimelineTrack("VIDEO 1", selected?.name ?: "Tarik media ke track (drag belum aktif)", Color(0xFF55477F))
+                        Row(Modifier.fillMaxWidth().height(29.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text("VIDEO 1", color = muted, fontSize = 8.sp, modifier = Modifier.width(54.dp))
+                            Row(
+                                Modifier.weight(1f).fillMaxHeight()
+                                    .background(Color(0xFF12141B), RoundedCornerShape(4.dp))
+                                    .horizontalScroll(rememberScrollState()).padding(3.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                timelineClips.forEach { clip ->
+                                    Box(
+                                        Modifier.width(116.dp).fillMaxHeight()
+                                            .background(if (clip.id == selectedClipId) accent.copy(alpha = 0.8f) else Color(0xFF55477F), RoundedCornerShape(3.dp))
+                                            .clickable {
+                                                selectedClipId = clip.id
+                                                selected = clip.media
+                                                notice = "Klip dipilih: ${clip.media.name}"
+                                            }.padding(horizontal = 5.dp),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Text(clip.media.name, color = Color.White, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    }
+                                }
+                                if (timelineClips.isEmpty()) Text("Pilih media lalu tekan + Tambah klip", color = muted, fontSize = 8.sp)
+                            }
+                        }
                         TimelineTrack("AUDIO 1", "Audio track • belum aktif", Color(0xFF315D62))
                         TimelineTrack("TEXT 1", "Text / captions • belum aktif", Color(0xFF72533B))
                     }
