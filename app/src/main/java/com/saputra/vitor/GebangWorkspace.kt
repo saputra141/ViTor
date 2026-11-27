@@ -29,11 +29,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.media3.common.MediaItem
+import kotlinx.coroutines.delay
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
 private data class WorkspaceMedia(val uri: Uri, val name: String)
-private data class TimelineClip(val id: Int, val media: WorkspaceMedia)
+private data class TimelineClip(val id: Int, val media: WorkspaceMedia, val startMs: Long = 0L, val endMs: Long = 0L)
 
 private val editorBg = Color(0xFF111218)
 private val panelBg = Color(0xFF1B1D26)
@@ -52,6 +53,8 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
     var activeTool by remember { mutableStateOf("Media") }
     var notice by remember { mutableStateOf("Workspace Android • fondasi antarmuka") }
     var showInspector by remember { mutableStateOf(true) }
+    var playheadMs by remember { mutableLongStateOf(0L) }
+    var durationMs by remember { mutableLongStateOf(0L) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -77,7 +80,8 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                     .put("timeline", JSONArray().apply {
                         timelineClips.forEachIndexed { index, clip ->
                             put(JSONObject().put("id", clip.id).put("mediaUri", clip.media.uri.toString())
-                                .put("mediaName", clip.media.name).put("track", "VIDEO 1").put("order", index))
+                                .put("mediaName", clip.media.name).put("track", "VIDEO 1").put("order", index)
+                                .put("startMs", clip.startMs).put("endMs", clip.endMs))
                         }
                     })
                 context.contentResolver.openOutputStream(uri)?.use { it.write(root.toString(2).toByteArray(Charsets.UTF_8)) }
@@ -88,12 +92,26 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
     }
 
     val player = remember { ExoPlayer.Builder(context).build() }
-    LaunchedEffect(selected?.uri) {
-        selected?.let {
-            player.setMediaItem(MediaItem.fromUri(it.uri))
+    val activeClip = timelineClips.firstOrNull { it.id == selectedClipId && it.media.uri == selected?.uri }
+    LaunchedEffect(selected?.uri, activeClip?.startMs, activeClip?.endMs) {
+        selected?.let { item ->
+            val builder = MediaItem.Builder().setUri(item.uri)
+            if (activeClip != null && activeClip.endMs > activeClip.startMs) {
+                builder.setClippingConfiguration(MediaItem.ClippingConfiguration.Builder().setStartPositionMs(activeClip.startMs).setEndPositionMs(activeClip.endMs).build())
+            } else if (activeClip != null && activeClip.startMs > 0L) {
+                builder.setClippingConfiguration(MediaItem.ClippingConfiguration.Builder().setStartPositionMs(activeClip.startMs).build())
+            }
+            player.setMediaItem(builder.build())
             player.prepare()
             player.playWhenReady = false
         } ?: player.clearMediaItems()
+    }
+    LaunchedEffect(player) {
+        while (true) {
+            playheadMs = player.currentPosition.coerceAtLeast(0L)
+            durationMs = player.duration.takeIf { it > 0L } ?: 0L
+            delay(200)
+        }
     }
     DisposableEffect(Unit) { onDispose { player.release() } }
 
@@ -252,9 +270,9 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                                 IconButton(onClick = { player.playWhenReady = !player.isPlaying }, modifier = Modifier.size(30.dp)) {
                                     Icon(if (player.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, "Play/Pause", tint = accent)
                                 }
-                                Text("00:00:00", color = Color.White, fontSize = 10.sp)
+                                Text(formatTime(playheadMs), color = Color.White, fontSize = 10.sp)
                                 Spacer(Modifier.weight(1f))
-                                Text("00:00:00", color = muted, fontSize = 10.sp)
+                                Text(formatTime(durationMs), color = muted, fontSize = 10.sp)
                             }
                         }
                         if (showInspector) {
@@ -351,6 +369,42 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                                 if (timelineClips.isEmpty()) Text("Pilih media lalu tekan + Tambah klip", color = muted, fontSize = 8.sp)
                             }
                         }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text("TRIM", color = muted, fontSize = 8.sp, modifier = Modifier.width(54.dp))
+                            val clip = timelineClips.firstOrNull { it.id == selectedClipId }
+                            TextButton(onClick = {
+                                if (clip == null) notice = "Pilih klip di timeline dahulu."
+                                else {
+                                    val start = player.currentPosition.coerceAtLeast(0L)
+                                    val updated = clip.copy(startMs = start, endMs = if (clip.endMs > start) clip.endMs else 0L)
+                                    val index = timelineClips.indexOfFirst { it.id == clip.id }
+                                    if (index >= 0) timelineClips[index] = updated
+                                    notice = "Titik IN diatur ke " + formatTime(start)
+                                }
+                            }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) { Text("Set IN", color = accent, fontSize = 8.sp) }
+                            TextButton(onClick = {
+                                if (clip == null) notice = "Pilih klip di timeline dahulu."
+                                else {
+                                    val end = player.currentPosition.coerceAtLeast(0L)
+                                    if (end <= clip.startMs) notice = "Titik OUT harus setelah titik IN."
+                                    else {
+                                        val index = timelineClips.indexOfFirst { it.id == clip.id }
+                                        if (index >= 0) timelineClips[index] = clip.copy(endMs = end)
+                                        notice = "Titik OUT diatur ke " + formatTime(end)
+                                    }
+                                }
+                            }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) { Text("Set OUT", color = accent, fontSize = 8.sp) }
+                            TextButton(onClick = {
+                                if (clip == null) notice = "Pilih klip di timeline dahulu."
+                                else {
+                                    val index = timelineClips.indexOfFirst { it.id == clip.id }
+                                    if (index >= 0) timelineClips[index] = clip.copy(startMs = 0L, endMs = 0L)
+                                    notice = "Trim klip direset."
+                                }
+                            }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) { Text("Reset", color = Color(0xFFFFC078), fontSize = 8.sp) }
+                            Spacer(Modifier.weight(1f))
+                            Text(if (clip == null) "Belum ada klip dipilih" else "IN " + formatTime(clip.startMs) + " • OUT " + (if (clip.endMs > 0L) formatTime(clip.endMs) else "akhir"), color = muted, fontSize = 8.sp)
+                        }
                         TimelineTrack("AUDIO 1", "Audio track • belum aktif", Color(0xFF315D62))
                         TimelineTrack("TEXT 1", "Text / captions • belum aktif", Color(0xFF72533B))
                     }
@@ -368,6 +422,11 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
             }
         }
     }
+}
+
+private fun formatTime(ms: Long): String {
+    val totalSeconds = ms.coerceAtLeast(0L) / 1000L
+    return "%02d:%02d:%02d".format(totalSeconds / 3600, (totalSeconds % 3600) / 60, totalSeconds % 60)
 }
 
 private fun queryDisplayName(context: Context, uri: Uri): String? = runCatching {
