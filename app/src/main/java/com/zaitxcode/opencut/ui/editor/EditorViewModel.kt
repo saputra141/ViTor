@@ -344,12 +344,22 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         return raw ?: "media"
     }
 
-    /** Persists the current project. */
-    fun save() {
-        val active = store ?: return
+    /**
+     * Persists the current project. [onSaved] runs on the main thread after the
+     * disk write finishes, so callers can safely navigate to export without
+     * racing the export screen's project reload.
+     */
+    fun save(onSaved: (() -> Unit)? = null) {
+        val active = store ?: run {
+            onSaved?.invoke()
+            return
+        }
         val snapshot = active.project
         viewModelScope.launch {
-            projectStore.writeProject(snapshot.copy(updatedAt = System.currentTimeMillis()))
+            val saved = projectStore.writeProject(
+                snapshot.copy(updatedAt = System.currentTimeMillis()),
+            )
+            if (saved) onSaved?.invoke()
         }
     }
 
