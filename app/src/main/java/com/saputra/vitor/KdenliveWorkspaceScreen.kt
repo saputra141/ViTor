@@ -1,0 +1,189 @@
+package com.saputra.vitor
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+private val KdBg = Color(0xFF17191D)
+private val KdPanel = Color(0xFF22252B)
+private val KdPanel2 = Color(0xFF2B2F36)
+private val KdLine = Color(0xFF3A3F48)
+private val KdText = Color(0xFFE5E7EB)
+private val KdMuted = Color(0xFF9AA1AC)
+private val KdAccent = Color(0xFF3DAEE9)
+
+/**
+ * Kdenlive-inspired Android workspace shell.
+ * This is the first UI port layer; editing actions are connected to the native
+ * ViTor engine incrementally and are not represented as complete Kdenlive parity.
+ */
+@Composable
+fun KdenliveWorkspaceScreen(
+    projectId: String,
+    onBack: () -> Unit,
+    onExport: () -> Unit,
+) {
+    var selectedTab by remember { mutableStateOf("Project Bin") }
+    var selectedTool by remember { mutableStateOf("Select") }
+    var playing by remember { mutableStateOf(false) }
+    var selectedClip by remember { mutableStateOf("Clip 01") }
+
+    Column(Modifier.fillMaxSize().background(KdBg)) {
+        Row(
+            Modifier.fillMaxWidth().height(42.dp).background(Color(0xFF202329)).padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("ViTor  /  Kdenlive Workspace", color = KdText, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+            Spacer(Modifier.weight(1f))
+            Text(projectId.take(18), color = KdMuted, fontSize = 11.sp)
+            Spacer(Modifier.width(12.dp))
+            Text("−   □   ×", color = KdMuted, fontSize = 12.sp)
+        }
+        Row(
+            Modifier.fillMaxWidth().height(38.dp).background(KdPanel).padding(horizontal = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            listOf("File", "Edit", "View", "Project", "Clip", "Timeline", "Monitor", "Settings", "Help").forEach {
+                Text(it, color = KdText, fontSize = 11.sp, modifier = Modifier.clickable { selectedTab = it }.padding(horizontal = 8.dp, vertical = 8.dp))
+            }
+            Spacer(Modifier.weight(1f))
+            TextButton(onClick = onBack, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Projects", fontSize = 11.sp) }
+            Button(onClick = onExport, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp), colors = ButtonDefaults.buttonColors(containerColor = KdAccent)) {
+                Text("Render", fontSize = 11.sp, color = Color.Black)
+            }
+        }
+        Row(Modifier.fillMaxWidth().weight(1f).padding(6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.weight(0.26f).fillMaxHeight().background(KdPanel, RoundedCornerShape(5.dp))) {
+                Row(Modifier.fillMaxWidth().height(34.dp).background(KdPanel2).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(selectedTab, color = KdText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.weight(1f))
+                    Icon(Icons.Default.Add, null, tint = KdMuted, modifier = Modifier.size(17.dp))
+                }
+                Row(Modifier.fillMaxWidth().padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf("Project Bin", "Effects", "History").forEach { tab ->
+                        Text(tab, color = if (selectedTab == tab) KdAccent else KdMuted, fontSize = 9.sp,
+                            modifier = Modifier.clickable { selectedTab = tab }.padding(4.dp))
+                    }
+                }
+                if (selectedTab == "Effects") {
+                    listOf("Audio", "Blur and Sharpen", "Color Correction", "Crop and Transform", "Motion", "Stylize").forEach { PanelEntry(it) }
+                } else {
+                    PanelEntry("All clips")
+                    PanelEntry("Video 01.mp4")
+                    PanelEntry("Audio 01.wav")
+                    PanelEntry("Image 01.png")
+                    Spacer(Modifier.weight(1f))
+                    Text("Drag media to the timeline", color = KdMuted, fontSize = 9.sp, modifier = Modifier.padding(10.dp))
+                }
+            }
+            Column(Modifier.weight(0.48f).fillMaxHeight().background(Color(0xFF101216), RoundedCornerShape(5.dp))) {
+                Row(Modifier.fillMaxWidth().height(34.dp).background(KdPanel).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Project Monitor", color = KdText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.weight(1f))
+                    Text("1920 × 1080  •  30 fps", color = KdMuted, fontSize = 9.sp)
+                }
+                Box(Modifier.fillMaxWidth().weight(1f).padding(12.dp).background(Color(0xFF050608)), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.Movie, null, tint = Color(0xFF414854), modifier = Modifier.size(42.dp))
+                        Text("Project Preview", color = Color(0xFF777F8C), fontSize = 12.sp)
+                        Text("Select a clip to preview", color = Color(0xFF555D68), fontSize = 9.sp)
+                    }
+                }
+                Row(Modifier.fillMaxWidth().height(42.dp).background(KdPanel).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { playing = !playing }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = KdText) }
+                    Icon(Icons.Default.SkipPrevious, null, tint = KdMuted, modifier = Modifier.size(19.dp))
+                    Icon(Icons.Default.SkipNext, null, tint = KdMuted, modifier = Modifier.size(19.dp))
+                    Spacer(Modifier.weight(1f))
+                    Text("00:00:00:00", color = KdText, fontSize = 11.sp)
+                }
+            }
+            Column(Modifier.weight(0.26f).fillMaxHeight().background(KdPanel, RoundedCornerShape(5.dp))) {
+                Text("Properties", color = KdText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth().background(KdPanel2).padding(9.dp))
+                Text(selectedClip, color = KdAccent, fontSize = 11.sp, modifier = Modifier.padding(9.dp))
+                listOf("Position", "Scale", "Rotation", "Opacity", "Volume").forEach { label ->
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 9.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(label, color = KdMuted, fontSize = 10.sp)
+                        Spacer(Modifier.weight(1f))
+                        Text(if (label == "Opacity" || label == "Volume") "100%" else "0.0", color = KdText, fontSize = 10.sp)
+                    }
+                    HorizontalDivider(color = KdLine, thickness = 0.5.dp)
+                }
+            }
+        }
+        Column(Modifier.fillMaxWidth().height(208.dp).padding(horizontal = 6.dp).background(KdPanel, RoundedCornerShape(5.dp))) {
+            Row(Modifier.fillMaxWidth().height(36.dp).background(KdPanel2).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Timeline", color = KdText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.width(12.dp))
+                listOf("Select", "Razor", "Spacer").forEach { tool ->
+                    Text(tool, color = if (selectedTool == tool) KdAccent else KdMuted, fontSize = 10.sp,
+                        modifier = Modifier.clickable { selectedTool = tool }.padding(horizontal = 7.dp, vertical = 5.dp))
+                }
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Default.Remove, null, tint = KdMuted, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Add, null, tint = KdMuted, modifier = Modifier.size(16.dp).padding(start = 4.dp))
+            }
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                Column(Modifier.width(76.dp).fillMaxHeight().background(Color(0xFF252930))) {
+                    listOf("V2", "V1", "A1", "A2").forEach { track ->
+                        Box(Modifier.fillMaxWidth().weight(1f).border(0.5.dp, KdLine).padding(start = 8.dp), contentAlignment = Alignment.CenterStart) {
+                            Text(track, color = KdMuted, fontSize = 10.sp)
+                        }
+                    }
+                }
+                Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(5.dp)) {
+                    repeat(4) { index ->
+                        Box(Modifier.width(760.dp).weight(1f).border(0.5.dp, KdLine)) {
+                            if (index == 1) {
+                                Row(Modifier.fillMaxHeight().padding(start = 18.dp, top = 3.dp, bottom = 3.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    TimelineClip("Video 01", Modifier.width(180.dp), selectedClip == "Video 01") { selectedClip = "Video 01" }
+                                    TimelineClip("Clip 01", Modifier.width(140.dp), selectedClip == "Clip 01") { selectedClip = "Clip 01" }
+                                }
+                            }
+                            if (index == 2) {
+                                TimelineClip("Audio 01", Modifier.padding(start = 60.dp, top = 3.dp, bottom = 3.dp).width(260.dp), false) { selectedClip = "Audio 01" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth().height(22.dp).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("Ready", color = KdMuted, fontSize = 9.sp)
+            Spacer(Modifier.weight(1f))
+            Text("ViTor Android • Kdenlive-inspired workspace", color = KdMuted, fontSize = 9.sp)
+        }
+    }
+}
+
+@Composable
+private fun PanelEntry(label: String) {
+    Row(Modifier.fillMaxWidth().clickable { }.padding(horizontal = 9.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Default.InsertDriveFile, null, tint = KdMuted, modifier = Modifier.size(15.dp))
+        Spacer(Modifier.width(7.dp))
+        Text(label, color = KdText, fontSize = 10.sp)
+    }
+}
+
+@Composable
+private fun TimelineClip(label: String, modifier: Modifier, selected: Boolean, onClick: () -> Unit) {
+    Box(modifier.fillMaxHeight().background(if (selected) Color(0xFF286D91) else Color(0xFF455A70), RoundedCornerShape(3.dp))
+        .border(1.dp, if (selected) KdAccent else Color(0xFF62788E), RoundedCornerShape(3.dp))
+        .clickable(onClick = onClick).padding(6.dp), contentAlignment = Alignment.CenterStart) {
+        Text(label, color = Color.White, fontSize = 9.sp, maxLines = 1)
+    }
+}
