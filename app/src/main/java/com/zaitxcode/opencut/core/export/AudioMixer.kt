@@ -41,21 +41,44 @@ class AudioMixer(private val context: Context) {
         if (plans.isEmpty()) return null
 
         val totalSamples = maxOf(1, (durationUs * sampleRate / 1_000_000L).toInt())
-        val mixed = ShortArray(totalSamples * channels)
+        // Accumulate in 32-bit space and clamp once at the end. Clamping after
+        // every layer would make the result depend on track order and distort mixes.
+        val accumulator = IntArray(totalSamples * channels)
 
         for (plan in plans) {
             val pcm = decodeToPcm(plan.uri) ?: continue
             val gain = (plan.volume * 0.8f).coerceIn(0f, 4f)
-            val offsetSamples = (plan.startUs * sampleRate / 1_000_000L).toInt()
-            var index = 0
-            while (index < pcm.size / 2 && offsetSamples + index / 2 < totalSamples) {
-                val target = (offsetSamples + index / 2) * 2 + (index % 2)
-                val sample = (pcm[index] * gain).toInt().coerceIn(-32768, 32767)
-                mixed[target] = (mixed[target] + sample).coerceIn(-32768, 32767).toShort()
-                index++
+            val targetStart = (plan.startUs * sampleRate / 1_000_000L).toInt()
+                .coerceAtLeast(0)
+            val sourceStart = (plan.sourceStartUs * sampleRate / 1_000_000L).toInt()
+                .coerceAtLeast(0)
+            val sourceFrames = (plan.sourceDurationUs * sampleRate / 1_000_000L)
+                .coerceAtLeast(0L)
+            val targetFrames = (plan.targetDurationUs * sampleRate / 1_000_000L)
+                .coerceAtLeast(0L)
+            val framesToMix = minOf(targetFrames, (totalSamples - targetStart).toLong())
+            if (framesToMix <= 0L || sourceFrames <= 0L) continue
+
+            // Map each output frame across the segment's trimmed source window.
+            // This honours both left/right trims and speed changes.
+            for (frame in 0 until framesToMix.toInt()) {
+                val sourceFrame = sourceStart + (
+                    frame.toDouble() * sourceFrames / targetFrames
+                ).toInt()
+                if (sourceFrame >= pcm.size / channels) break
+                val destinationFrame = targetStart + frame
+                for (channel in 0 until channels) {
+                    val sourceChannel = if (pcm.size / channels == 1) 0 else channel
+                    val sample = (pcm[sourceFrame * channels + sourceChannel] * gain).toInt()
+                    val destination = destinationFrame * channels + channel
+                    accumulator[destination] += sample
+                }
             }
         }
 
+        val mixed = ShortArray(accumulator.size) { index ->
+            accumulator[index].coerceIn(-32768, 32767).toShort()
+        }
         return encodeAac(mixed, totalSamples)
     }
 
@@ -63,8 +86,10 @@ class AudioMixer(private val context: Context) {
     private data class AudioPlan(
         val uri: Uri,
         val startUs: Long,
+        val sourceStartUs: Long,
+        val sourceDurationUs: Long,
+        val targetDurationUs: Long,
         val volume: Float,
-        val muted: Boolean,
     )
 
     private fun audioPlans(project: Project): List<AudioPlan> {
@@ -78,8 +103,10 @@ class AudioMixer(private val context: Context) {
                 plans += AudioPlan(
                     uri = Uri.parse(material.path),
                     startUs = segment.target.start,
+                    sourceStartUs = segment.source.start,
+                    sourceDurationUs = segment.source.duration,
+                    targetDurationUs = segment.target.duration,
                     volume = segment.volume,
-                    muted = segment.muted,
                 )
             }
         }
