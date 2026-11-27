@@ -42,6 +42,13 @@ class VideoDecoder(
 
     /** True once a frame has actually been rendered into the texture. */
     private var hasFrame = false
+    private val textureTransform = FloatArray(16).also {
+        android.opengl.Matrix.setIdentityM(it, 0)
+    }
+
+    /** SurfaceTexture crop/orientation transform for the current decoded frame. */
+    val textureTransformMatrix: FloatArray
+        get() = textureTransform.copyOf()
 
     val textureId: Int = createExternalTexture()
     private val released = AtomicBoolean(false)
@@ -136,7 +143,10 @@ class VideoDecoder(
         if (!frameAvailable) return false
         frameAvailable = false
         return try {
-            surfaceTexture?.updateTexImage()
+            surfaceTexture?.let {
+                it.updateTexImage()
+                it.getTransformMatrix(textureTransform)
+            }
             true
         } catch (error: Throwable) {
             Log.w(TAG, "updateTexImage failed", error)
