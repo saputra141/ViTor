@@ -13,17 +13,17 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Prepare
-        run: mkdir -p input assembled extracted payload logs
+        run: mkdir -p input assembled extracted payload logs asar-unpacked
 
       - name: Download verified original assets
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 45920868698 --repo saputra141/ViTor --dir input
 
-      - name: Reassemble portable executable
+      - name: Reassemble and unpack original Gebang package
         shell: bash
         run: |
           set -euo pipefail
@@ -35,35 +35,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y p7zip-full file binutils
           7z x -y -oextracted assembled/Gebang-Editor-Portable.exe
-          test -s 'extracted/$PLUGINSDIR/app-64.7z'
+          7z x -y -opayload 'extracted/$PLUGINSDIR/app-64.7z'
+          cp payload/resources/app.asar assembled/app.asar
+          npx --yes @electron/asar extract assembled/app.asar asar-unpacked
 
-      - name: Extract and fingerprint the actual app payload
+      - name: Fingerprint app source and assets
         shell: bash
         run: |
           set -euo pipefail
-          7z l 'extracted/$PLUGINSDIR/app-64.7z' > logs/app-archive-list.txt
-          7z x -y -opayload 'extracted/$PLUGINSDIR/app-64.7z' > logs/app-extract.txt
-          find payload -type f -printf '%p %s bytes\n' | sort > logs/payload-files.txt
-          find payload -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.node' -o -iname '*.so' \) -print0 | xargs -0 -r file > logs/payload-binaries.txt
-          find payload -type f \( -iname 'package.json' -o -iname '*.asar' -o -iname 'electron.asar' -o -iname 'app.asar' -o -iname 'manifest.json' \) -print > logs/package-markers.txt
-          grep -RIlE 'electron|chromium|react|vue|angular|tauri|webview2|ffmpeg|sharp|canvas|\.NET|dotnet|qt' payload --include='package.json' --include='*.json' --include='*.yml' --include='*.yaml' --include='*.txt' 2>/dev/null | head -n 100 > logs/technology-files.txt || true
+          find asar-unpacked -type f -printf '%p %s bytes\n' | sort > logs/asar-files.txt
+          find asar-unpacked -maxdepth 3 -type f \( -name 'package.json' -o -name '*.html' -o -name '*.css' -o -name '*.map' \) -print > logs/source-markers.txt
           {
-            echo '=== NESTED ARCHIVE ==='
-            sed -n '1,180p' logs/app-archive-list.txt
-            echo '=== APP FILES ==='
-            sed -n '1,260p' logs/payload-files.txt
-            echo '=== BINARY TYPES ==='
-            cat logs/payload-binaries.txt
-            echo '=== PACKAGE MARKERS ==='
-            cat logs/package-markers.txt
-            echo '=== TECHNOLOGY FILES ==='
-            cat logs/technology-files.txt
-          } | tee logs/summary.txt
+            echo '=== PACKAGE JSON FILES ==='
+            find asar-unpacked -name package.json -type f -print -exec sed -n '1,240p' {} \;
+            echo '=== SOURCE FILES ==='
+            sed -n '1,350p' logs/source-markers.txt
+            echo '=== FILE TREE ==='
+            sed -n '1,500p' logs/asar-files.txt
+            echo '=== WINDOWS-SPECIFIC REFERENCES ==='
+            grep -RIlE 'win32|win-x64|license-core|onnxruntime|ffmpeg|electron-store|ipcMain|BrowserWindow|autoUpdater' asar-unpacked --include='*.js' --include='*.json' --include='*.html' --include='*.css' 2>/dev/null | head -n 250 || true
+          } | tee logs/asar-summary.txt
 
-      - name: Upload package inspection
+      - name: Upload app source inspection
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-package-inspection
+          name: gebang-asar-inspection
           path: logs/
           retention-days: 3
