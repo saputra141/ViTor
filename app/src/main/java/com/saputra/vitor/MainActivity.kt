@@ -330,16 +330,18 @@ private fun ViTorEditor(onOpenCatalog: () -> Unit) {
                 }
             }
 
-            Text("LAYER", color = Color(0xFFAAAAB8), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LayerChip(Icons.Default.Movie, "Video")
-                LayerChip(Icons.Default.AudioFile, "Audio")
-                LayerChip(Icons.Default.TextFields, "Teks")
-            }
+            TimelinePanel(
+                clipNames = clips.map { it.name },
+                selectedIndex = clips.indexOf(selected).coerceAtLeast(0),
+                playheadMs = player.currentPosition.coerceAtLeast(0L),
+                durationMs = player.duration.takeIf { it > 0 } ?: 0L,
+                onSelectClip = { index -> clips.getOrNull(index)?.let { selected = it } },
+                onSeek = { position -> player.seekTo(position) }
+            )
 
             Spacer(Modifier.weight(1f))
             Text(status, color = Color(0xFF8F90A0), fontSize = 11.sp)
-            Text("ViTor 0.3.0 • Native Android ARM64", color = Color(0xFF686A78), fontSize = 10.sp)
+            Text("ViTor 0.4.0 • Native Android ARM64", color = Color(0xFF686A78), fontSize = 10.sp)
         }
     }
 }
