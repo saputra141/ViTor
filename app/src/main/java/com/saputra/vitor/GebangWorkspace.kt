@@ -26,11 +26,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import org.json.JSONArray
+import org.json.JSONObject
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
 private data class WorkspaceMedia(val uri: Uri, val name: String)
+private data class TimelineClip(val id: Int, val media: WorkspaceMedia)
 
 private val editorBg = Color(0xFF111218)
 private val panelBg = Color(0xFF1B1D26)
@@ -42,6 +45,9 @@ private val muted = Color(0xFF9295A5)
 fun GebangWorkspace(onOpenCatalog: () -> Unit) {
     val context = LocalContext.current
     val media = remember { mutableStateListOf<WorkspaceMedia>() }
+    val timelineClips = remember { mutableStateListOf<TimelineClip>() }
+    var nextClipId by remember { mutableIntStateOf(1) }
+    var selectedClipId by remember { mutableIntStateOf(-1) }
     var selected by remember { mutableStateOf<WorkspaceMedia?>(null) }
     var activeTool by remember { mutableStateOf("Media") }
     var notice by remember { mutableStateOf("Workspace Android • fondasi antarmuka") }
@@ -59,6 +65,28 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
             notice = "Media ditambahkan: $name"
         }
     }
+    val saveProject = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri != null) {
+            runCatching {
+                val root = JSONObject()
+                    .put("format", "vitor-android-project")
+                    .put("version", 1)
+                    .put("media", JSONArray().apply {
+                        media.forEach { item -> put(JSONObject().put("name", item.name).put("uri", item.uri.toString())) }
+                    })
+                    .put("timeline", JSONArray().apply {
+                        timelineClips.forEachIndexed { index, clip ->
+                            put(JSONObject().put("id", clip.id).put("mediaUri", clip.media.uri.toString())
+                                .put("mediaName", clip.media.name).put("track", "VIDEO 1").put("order", index))
+                        }
+                    })
+                context.contentResolver.openOutputStream(uri)?.use { it.write(root.toString(2).toByteArray(Charsets.UTF_8)) }
+                    ?: error("Tidak bisa membuka file tujuan")
+            }.onSuccess { notice = "Metadata proyek tersimpan. Format ini belum kompatibel dengan Gebang desktop." }
+                .onFailure { notice = "Gagal menyimpan proyek: ${it.message}" }
+        }
+    }
+
     val player = remember { ExoPlayer.Builder(context).build() }
     LaunchedEffect(selected?.uri) {
         selected?.let {
@@ -86,7 +114,7 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                 Spacer(Modifier.weight(1f))
                 ToolbarAction(Icons.Default.Undo, "Undo") { notice = "Undo belum tersedia pada engine Android." }
                 ToolbarAction(Icons.Default.Redo, "Redo") { notice = "Redo belum tersedia pada engine Android." }
-                ToolbarAction(Icons.Default.Save, "Simpan") { notice = "Penyimpanan proyek belum terhubung ke format asli." }
+                ToolbarAction(Icons.Default.Save, "Simpan") { saveProject.launch("Gebang-Project.json") }
                 Spacer(Modifier.width(4.dp))
                 Button(
                     onClick = { notice = "Export belum aktif: mesin render native belum tersedia." },
