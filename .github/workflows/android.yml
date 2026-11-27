@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, ops/fetch-wine-gebang-assets-20261127 ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
