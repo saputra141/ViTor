@@ -129,7 +129,7 @@ fun KdenliveWorkspaceScreen(
                 } else {
                     Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                         materials.forEach { material ->
-                            val uri = editorViewModel.uris.value[material.id] ?: material.path?.let(Uri::parse)
+                            val uri = editorViewModel.uris.value[material.id] ?: material.path.takeIf { it.isNotBlank() }?.let(Uri::parse)
                             Row(
                                 Modifier.fillMaxWidth().clickable {
                                     val segment = project.tracks.asSequence().flatMap { it.segments.asSequence() }.firstOrNull { it.materialId == material.id }
@@ -189,7 +189,7 @@ fun KdenliveWorkspaceScreen(
                     project = project,
                     playheadUs = playheadUs,
                     selectedSegmentId = selectedSegmentId,
-                    onSelect = editorViewModel::select,
+                    onSelect = { segmentId -> editorViewModel.select(segmentId) },
                     onSeek = editorViewModel::seek,
                     onSplit = editorViewModel::split,
                     onDelete = editorViewModel::delete,
