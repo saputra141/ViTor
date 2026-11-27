@@ -46,7 +46,8 @@ class AudioMixer(private val context: Context) {
         val accumulator = IntArray(totalSamples * channels)
 
         for (plan in plans) {
-            val pcm = decodeToPcm(plan.uri) ?: continue
+            val pcm = decodeToPcm(plan.uri)
+                ?: error("Unable to decode audio source: ${plan.uri}")
             val gain = (plan.volume * 0.8f).coerceIn(0f, 4f)
             val targetStart = (plan.startUs * sampleRate / 1_000_000L).toInt()
                 .coerceAtLeast(0)
