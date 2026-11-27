@@ -63,24 +63,32 @@ class ExportEngine(private val context: Context) {
         settings: ExportSettings,
         onProgress: (ExportProgress) -> Unit = {},
     ): Result<File> = runCatching {
+        require(settings.width >= 16 && settings.height >= 16) { "Invalid export dimensions" }
+        require(settings.width % 2 == 0 && settings.height % 2 == 0) {
+            "H.264 export dimensions must be even numbers"
+        }
+        require(settings.frameRate in 1..60) { "Frame rate must be between 1 and 60 FPS" }
+        require(settings.bitRate in 250_000..100_000_000) { "Invalid video bitrate" }
+
         val durationUs = project.durationUs.coerceAtLeast(1_000_000L)
         val frameCount = ((durationUs / 1_000_000.0) * settings.frameRate).roundToInt().coerceAtLeast(1)
 
         output.parentFile?.mkdirs()
         if (output.exists()) output.delete()
 
-        val muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        var videoTrack = -1
-        var audioTrack = -1
-
-        // The audio is encoded first: a muxer only accepts a new track while it
-        // has not been started, and the audio track has to exist before the
-        // container is started with the video track.
+        // Encode audio before creating the muxer. A decoder/encoder failure must
+        // fail the export visibly instead of silently publishing a video without
+        // its requested soundtrack.
+        onProgress(ExportProgress(percent = 0, stage = "Preparing audio"))
         val encodedAudio = if (settings.includeAudio) {
-            runCatching { AudioMixer(context).encode(project, durationUs) }.getOrNull()
+            AudioMixer(context).encode(project, durationUs)
         } else {
             null
         }
+
+        val muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        var videoTrack = -1
+        var audioTrack = -1
         if (encodedAudio != null) {
             audioTrack = muxer.addTrack(encodedAudio.format)
         }
@@ -286,6 +294,9 @@ class ExportEngine(private val context: Context) {
         muxer.release()
         onProgress(ExportProgress(percent = 100, stage = "Finished"))
         output
+    }.onFailure {
+        runCatching { output.delete() }
+        Log.e("ViTor/Export", "Export failed", it)
     }
 
 }
