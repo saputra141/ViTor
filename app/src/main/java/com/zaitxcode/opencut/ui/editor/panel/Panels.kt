@@ -751,6 +751,13 @@ private fun KeyframePanel(project: Project, selectedSegment: Segment?, viewModel
 
 /** The permissions that are needed to read the media library of the device. */
 private fun mediaPermissions(): Array<String> = when {
+    Build.VERSION.SDK_INT >= 34 -> arrayOf(
+        Manifest.permission.READ_MEDIA_IMAGES,
+        Manifest.permission.READ_MEDIA_VIDEO,
+        Manifest.permission.READ_MEDIA_AUDIO,
+        Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+    )
+
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
         Manifest.permission.READ_MEDIA_IMAGES,
         Manifest.permission.READ_MEDIA_VIDEO,
