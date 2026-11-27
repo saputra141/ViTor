@@ -77,7 +77,7 @@ fun GebangWorkspace(onOpenCatalog: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(Modifier.size(27.dp).background(accent, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.MovieEdit, null, tint = Color(0xFF15131F), modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Movie, null, tint = Color(0xFF15131F), modifier = Modifier.size(18.dp))
                 }
                 Spacer(Modifier.width(8.dp))
                 Text("Gebang Editor", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
