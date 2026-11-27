@@ -63,7 +63,7 @@ fun EditorScreen(
             val existing = (context.applicationContext as com.saputra.vitor.ViTorApplication)
                 .projectStore
                 .readProject(projectId)
-            viewModel.open(existing ?: newProject("Untitled"))
+            viewModel.open(existing ?: newProject("ViTor Project").copy(id = projectId))
         }
     }
 
