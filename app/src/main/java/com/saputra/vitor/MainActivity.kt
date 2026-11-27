@@ -2,6 +2,7 @@ package com.saputra.vitor
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -20,15 +21,24 @@ class MainActivity : ComponentActivity() {
                 background = Color(0xFF101116),
                 surface = Color(0xFF1B1D26)
             )) {
+                var projectId by remember { mutableStateOf<String?>(null) }
                 var showExport by remember { mutableStateOf(false) }
-                if (showExport) {
-                    ExportScreen(projectId = "vitor-main", onBack = { showExport = false })
-                } else {
-                    EditorScreen(
-                        projectId = "vitor-main",
-                        onBack = { },
-                        onExport = { showExport = true }
+
+                BackHandler(enabled = showExport || projectId != null) {
+                    if (showExport) showExport = false else projectId = null
+                }
+
+                when {
+                    showExport && projectId != null -> ExportScreen(
+                        projectId = projectId!!,
+                        onBack = { showExport = false },
                     )
+                    projectId != null -> EditorScreen(
+                        projectId = projectId!!,
+                        onBack = { projectId = null },
+                        onExport = { showExport = true },
+                    )
+                    else -> ProjectLibraryScreen(onOpenProject = { projectId = it })
                 }
             }
         }
