@@ -107,7 +107,7 @@ fun PanelHost(
             Tool.SPEED -> SpeedPanel(selectedSegment, viewModel)
             Tool.CANVAS -> CanvasPanel(project, viewModel)
             Tool.CROP -> CropPanel(selectedSegment, viewModel)
-            Tool.KEYFRAME -> KeyframePanel(selectedSegment, viewModel)
+            Tool.KEYFRAME -> KeyframePanel(project, selectedSegment, viewModel)
         }
     }
 }
@@ -710,25 +710,33 @@ private fun CropPanel(selectedSegment: Segment?, viewModel: EditorViewModel) {
 // -------------------------------------------------------------- keyframe ---
 
 @Composable
-private fun KeyframePanel(selectedSegment: Segment?, viewModel: EditorViewModel) {
+private fun KeyframePanel(project: Project, selectedSegment: Segment?, viewModel: EditorViewModel) {
     Column {
         PanelTitle(stringResource(R.string.tool_keyframe))
         if (selectedSegment == null) {
             Hint(stringResource(R.string.hint_select_layer))
             return@Column
         }
+        val materialKind = project.materials.find(selectedSegment.materialId)?.kind
+        val layerKind = when (materialKind) {
+            com.zaitxcode.opencut.core.model.MaterialKind.AUDIO -> KeyframeKind.AUDIO
+            com.zaitxcode.opencut.core.model.MaterialKind.TEXT -> KeyframeKind.TEXT
+            com.zaitxcode.opencut.core.model.MaterialKind.STICKER -> KeyframeKind.STICKER
+            com.zaitxcode.opencut.core.model.MaterialKind.FILTER -> KeyframeKind.FILTER
+            else -> KeyframeKind.VIDEO
+        }
         Row(
             modifier = Modifier.padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             ToolChip(label = stringResource(R.string.keyframe_position), selected = false, onClick = {
-                viewModel.addKeyframe(KeyframeKind.VIDEO)
+                viewModel.addKeyframe(layerKind)
             })
             ToolChip(label = stringResource(R.string.keyframe_scale), selected = false, onClick = {
-                viewModel.addKeyframe(KeyframeKind.VIDEO)
+                viewModel.addKeyframe(layerKind)
             })
             ToolChip(label = stringResource(R.string.keyframe_opacity), selected = false, onClick = {
-                viewModel.addKeyframe(KeyframeKind.VIDEO)
+                viewModel.addKeyframe(layerKind)
             })
             ToolChip(label = stringResource(R.string.keyframe_adjust), selected = false, onClick = {
                 viewModel.addKeyframe(KeyframeKind.ADJUST)
