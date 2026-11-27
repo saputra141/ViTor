@@ -136,6 +136,7 @@ class ExportEngine(private val context: Context) {
             composer.enableBlend()
             for (layer in layers) {
                 if (playheadUs !in layer.targetStartUs until (layer.targetStartUs + layer.targetDurationUs)) continue
+                var textureTransform: FloatArray? = null
                 val texture = when (layer.kind) {
                     LayerKind.VIDEO -> {
                         val decoder = decoders[layer.materialId] ?: run {
@@ -158,6 +159,7 @@ class ExportEngine(private val context: Context) {
                             if (!it.isNear(sourceTime)) it.seekTo(sourceTime)
                             it.advanceTo(sourceTime)
                             it.latchFrame()
+                            textureTransform = it.textureTransformMatrix
                             it.textureId
                         }
                     }
@@ -181,6 +183,7 @@ class ExportEngine(private val context: Context) {
                         }
                     } ?: 0,
                     lutIntensity = layer.filter?.intensity ?: 1f,
+                    textureTransform = textureTransform,
                 )
             }
             composer.disableBlend()
