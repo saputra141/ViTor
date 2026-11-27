@@ -141,9 +141,10 @@ class AudioMixer(private val context: Context) {
 
             var decodedRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var decodedChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
-            codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
-            codec.configure(format, null, null, 0)
-            codec.start()
+            val decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
+            codec = decoder
+            decoder.configure(format, null, null, 0)
+            decoder.start()
 
             // Keep decoded PCM in a byte buffer. ArrayList<Short> boxes every
             // sample and can multiply memory usage many times on long recordings.
@@ -155,24 +156,24 @@ class AudioMixer(private val context: Context) {
 
             while (!outputDone) {
                 if (!inputDone) {
-                    val inputIndex = codec.dequeueInputBuffer(10_000)
+                    val inputIndex = decoder.dequeueInputBuffer(10_000)
                     if (inputIndex >= 0) {
-                        val inputBuffer = codec.getInputBuffer(inputIndex)
+                        val inputBuffer = decoder.getInputBuffer(inputIndex)
                         inputBuffer?.clear()
                         val size = if (inputBuffer != null) extractor.readSampleData(inputBuffer, 0) else -1
                         if (size < 0) {
-                            codec.queueInputBuffer(
+                            decoder.queueInputBuffer(
                                 inputIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM,
                             )
                             inputDone = true
                         } else {
-                            codec.queueInputBuffer(inputIndex, 0, size, extractor.sampleTime, 0)
+                            decoder.queueInputBuffer(inputIndex, 0, size, extractor.sampleTime, 0)
                             extractor.advance()
                         }
                     }
                 }
 
-                when (val outputIndex = codec.dequeueOutputBuffer(bufferInfo, 10_000)) {
+                when (val outputIndex = decoder.dequeueOutputBuffer(bufferInfo, 10_000)) {
                     MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         val outputFormat = codec.outputFormat
                         if (outputFormat.containsKey(MediaFormat.KEY_SAMPLE_RATE)) {
@@ -188,7 +189,7 @@ class AudioMixer(private val context: Context) {
                         }
                     }
                     else -> if (outputIndex >= 0) {
-                        val outputBuffer = codec.getOutputBuffer(outputIndex)
+                        val outputBuffer = decoder.getOutputBuffer(outputIndex)
                         if (outputBuffer != null && bufferInfo.size > 0) {
                             outputBuffer.position(bufferInfo.offset)
                             outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
@@ -197,7 +198,7 @@ class AudioMixer(private val context: Context) {
                             pcmBytes.write(chunk)
                         }
                         val eos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
-                        codec.releaseOutputBuffer(outputIndex, false)
+                        decoder.releaseOutputBuffer(outputIndex, false)
                         if (eos) outputDone = true
                     }
                 }
