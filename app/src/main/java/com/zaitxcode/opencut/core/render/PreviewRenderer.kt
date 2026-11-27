@@ -172,10 +172,15 @@ class PreviewRenderer(private val context: Context) {
     }
 
     /** Releases every decoder and texture owned by the renderer. */
+    /** Releases every decoder and GL texture. Must run on the renderer's GL thread. */
     fun release() {
         decoders.values.forEach { runCatching { it.release() } }
         decoders.clear()
-        textures.clear()
+        if (textures.isNotEmpty()) {
+            GLES20.glDeleteTextures(textures.size, textures.values.toIntArray(), 0)
+            textures.clear()
+        }
+        composer.release()
     }
 
     companion object {
