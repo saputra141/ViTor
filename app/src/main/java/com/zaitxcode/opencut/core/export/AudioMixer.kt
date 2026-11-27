@@ -122,86 +122,105 @@ class AudioMixer(private val context: Context) {
      */
     private fun decodeToPcm(uri: Uri): ShortArray? = runCatching {
         val extractor = MediaExtractor()
-        extractor.setDataSource(context, uri, emptyMap())
-        var trackIndex = -1
-        var format: MediaFormat? = null
-        for (index in 0 until extractor.trackCount) {
-            val candidate = extractor.getTrackFormat(index)
-            val mime = candidate.getString(MediaFormat.KEY_MIME).orEmpty()
-            if (mime.startsWith("audio/")) {
-                trackIndex = index
-                format = candidate
-                break
+        var codec: MediaCodec? = null
+        try {
+            extractor.setDataSource(context, uri, emptyMap())
+            var trackIndex = -1
+            var inputFormat: MediaFormat? = null
+            for (index in 0 until extractor.trackCount) {
+                val candidate = extractor.getTrackFormat(index)
+                if (candidate.getString(MediaFormat.KEY_MIME).orEmpty().startsWith("audio/")) {
+                    trackIndex = index
+                    inputFormat = candidate
+                    break
+                }
             }
-        }
-        if (trackIndex < 0 || format == null) {
-            extractor.release()
-            return null
-        }
-        extractor.selectTrack(trackIndex)
+            val format = inputFormat ?: return@runCatching null
+            if (trackIndex < 0) return@runCatching null
+            extractor.selectTrack(trackIndex)
 
-        val sourceRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-        val sourceChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
-        val codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
-        codec.configure(format, null, null, 0)
-        codec.start()
+            var decodedRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+            var decodedChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
+            codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
+            codec.configure(format, null, null, 0)
+            codec.start()
 
-        val output = ArrayList<Short>()
-        val bufferInfo = MediaCodec.BufferInfo()
-        var inputDone = false
+            // Keep decoded PCM in a byte buffer. ArrayList<Short> boxes every
+            // sample and can multiply memory usage many times on long recordings.
+            val pcmBytes = java.io.ByteArrayOutputStream()
+            val bufferInfo = MediaCodec.BufferInfo()
+            var inputDone = false
+            var outputDone = false
+            var stalledAfterEos = 0
 
-        while (true) {
-            if (!inputDone) {
-                val inputIndex = codec.dequeueInputBuffer(10_000)
-                if (inputIndex >= 0) {
-                    val inputBuffer = codec.getInputBuffer(inputIndex)
-                    val size = if (inputBuffer != null) extractor.readSampleData(inputBuffer, 0) else -1
-                    if (size < 0) {
-                        codec.queueInputBuffer(
-                            inputIndex,
-                            0,
-                            0,
-                            0L,
-                            MediaCodec.BUFFER_FLAG_END_OF_STREAM,
-                        )
-                        inputDone = true
-                    } else {
-                        codec.queueInputBuffer(inputIndex, 0, size, extractor.sampleTime, 0)
-                        extractor.advance()
+            while (!outputDone) {
+                if (!inputDone) {
+                    val inputIndex = codec.dequeueInputBuffer(10_000)
+                    if (inputIndex >= 0) {
+                        val inputBuffer = codec.getInputBuffer(inputIndex)
+                        inputBuffer?.clear()
+                        val size = if (inputBuffer != null) extractor.readSampleData(inputBuffer, 0) else -1
+                        if (size < 0) {
+                            codec.queueInputBuffer(
+                                inputIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM,
+                            )
+                            inputDone = true
+                        } else {
+                            codec.queueInputBuffer(inputIndex, 0, size, extractor.sampleTime, 0)
+                            extractor.advance()
+                        }
+                    }
+                }
+
+                when (val outputIndex = codec.dequeueOutputBuffer(bufferInfo, 10_000)) {
+                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        val outputFormat = codec.outputFormat
+                        if (outputFormat.containsKey(MediaFormat.KEY_SAMPLE_RATE)) {
+                            decodedRate = outputFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+                        }
+                        if (outputFormat.containsKey(MediaFormat.KEY_CHANNEL_COUNT)) {
+                            decodedChannels = outputFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
+                        }
+                    }
+                    MediaCodec.INFO_TRY_AGAIN_LATER -> {
+                        if (inputDone && ++stalledAfterEos > 300) {
+                            error("Audio decoder timed out while flushing")
+                        }
+                    }
+                    else -> if (outputIndex >= 0) {
+                        val outputBuffer = codec.getOutputBuffer(outputIndex)
+                        if (outputBuffer != null && bufferInfo.size > 0) {
+                            outputBuffer.position(bufferInfo.offset)
+                            outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
+                            val chunk = ByteArray(bufferInfo.size)
+                            outputBuffer.get(chunk)
+                            pcmBytes.write(chunk)
+                        }
+                        val eos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
+                        codec.releaseOutputBuffer(outputIndex, false)
+                        if (eos) outputDone = true
                     }
                 }
             }
-            val outputIndex = codec.dequeueOutputBuffer(bufferInfo, 10_000)
-            if (outputIndex >= 0) {
-                val buffer = codec.getOutputBuffer(outputIndex)
-                if (buffer != null && bufferInfo.size > 0) {
-                    buffer.position(bufferInfo.offset)
-                    buffer.limit(bufferInfo.offset + bufferInfo.size)
-                    val shorts = buffer.order(ByteOrder.nativeOrder()).asShortBuffer()
-                    while (shorts.hasRemaining()) output.add(shorts.get())
-                }
-                codec.releaseOutputBuffer(outputIndex, false)
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) break
-            } else if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER && inputDone) {
-                break
-            }
-        }
-        codec.stop()
-        codec.release()
-        extractor.release()
 
-        val raw = ShortArray(output.size) { output[it] }
-        // The mixer works in stereo. Duplicate mono sources and downmix wider
-        // layouts by taking their first two channels instead of misreading samples.
-        val sourceFrames = raw.size / sourceChannels
-        val stereo = ShortArray(sourceFrames * channels)
-        for (frame in 0 until sourceFrames) {
-            val left = raw[frame * sourceChannels]
-            val right = if (sourceChannels > 1) raw[frame * sourceChannels + 1] else left
-            stereo[frame * channels] = left
-            stereo[frame * channels + 1] = right
+            val bytes = pcmBytes.toByteArray()
+            val shorts = ByteBuffer.wrap(bytes).order(ByteOrder.nativeOrder()).asShortBuffer()
+            val raw = ShortArray(shorts.remaining())
+            shorts.get(raw)
+            val sourceFrames = raw.size / decodedChannels
+            val stereo = ShortArray(sourceFrames * channels)
+            for (frame in 0 until sourceFrames) {
+                val left = raw[frame * decodedChannels]
+                val right = if (decodedChannels > 1) raw[frame * decodedChannels + 1] else left
+                stereo[frame * channels] = left
+                stereo[frame * channels + 1] = right
+            }
+            if (decodedRate == sampleRate) stereo else resample(stereo, decodedRate)
+        } finally {
+            runCatching { codec?.stop() }
+            runCatching { codec?.release() }
+            runCatching { extractor.release() }
         }
-        if (sourceRate == sampleRate) stereo else resample(stereo, sourceRate)
     }.getOrNull()
 
     /** Linear resampling of interleaved 16 bit PCM. */
