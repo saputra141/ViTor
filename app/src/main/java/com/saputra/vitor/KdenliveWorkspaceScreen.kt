@@ -74,7 +74,10 @@ fun KdenliveWorkspaceScreen(
         val added = mediaUris.filterNot { it in existing }.map { uri ->
             KdTimelineClip(clipIdCounter++, uri, uri.lastPathSegment?.substringAfterLast('/')?.takeLast(20) ?: "Media")
         }
-        if (added.isNotEmpty()) timelineClips = timelineClips + added
+        if (added.isNotEmpty()) {
+            timelineClips = timelineClips + added
+            if (selectedTimelineClipId == null) selectedTimelineClipId = added.first().id
+        }
         if (selectedMedia !in mediaUris) selectedMedia = mediaUris.firstOrNull()
     }
     LaunchedEffect(player, playing) {
@@ -175,6 +178,14 @@ fun KdenliveWorkspaceScreen(
                     Spacer(Modifier.weight(1f))
                     Text(formatTimecode(playheadMs), color = KdText, fontSize = 11.sp)
                 }
+                val duration = player.duration.takeIf { it > 0L } ?: 1L
+                Slider(
+                    value = playheadMs.coerceIn(0L, duration).toFloat(),
+                    onValueChange = { playheadMs = it.toLong(); player.seekTo(playheadMs) },
+                    valueRange = 0f..duration.toFloat(),
+                    modifier = Modifier.fillMaxWidth().height(24.dp).padding(horizontal = 12.dp),
+                    colors = SliderDefaults.colors(thumbColor = KdAccent, activeTrackColor = KdAccent)
+                )
             }
             Column(Modifier.weight(0.26f).fillMaxHeight().background(KdPanel, RoundedCornerShape(5.dp))) {
                 Text("Properties", color = KdText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
