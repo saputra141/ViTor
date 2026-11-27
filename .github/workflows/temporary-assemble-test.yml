@@ -1,0 +1,104 @@
+name: Temporary assemble and test Gebang Editor
+on:
+  push:
+    branches:
+      - ops/fetch-wine-gebang-assets-20261127
+    paths:
+      - .github/workflows/temporary-assemble-test.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  assemble-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Prepare folders
+        run: mkdir -p input assembled logs
+
+      - name: Download verified transfer artifacts from previous run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 45920868698 --repo saputra141/ViTor --dir input
+          find input -maxdepth 2 -type f -printf '%p %s bytes\n' | sort
+
+      - name: Reassemble Wine and Gebang files
+        shell: bash
+        run: |
+          set -euo pipefail
+          join_chunks() {
+            local artifact_prefix="$1"
+            local output="$2"
+            find "input/$artifact_prefix" -type f -print0 | sort -z | xargs -0 cat > "assembled/$output"
+            test -s "assembled/$output"
+          }
+          join_chunks wine-stable-0 wine-stable.part0
+          join_chunks wine-stable-1 wine-stable.part1
+          cat assembled/wine-stable.part0 assembled/wine-stable.part1 > assembled/wine-11.22-amd64-wow64.tar.xz
+
+          join_chunks wine-staging-0 wine-staging.part0
+          join_chunks wine-staging-1 wine-staging.part1
+          cat assembled/wine-staging.part0 assembled/wine-staging.part1 > assembled/wine-11.22-staging-amd64-wow64.tar.xz
+
+          join_chunks wine-proton-0 wine-proton.part0
+          cat assembled/wine-proton.part0 > assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
+
+          for i in 0 1 2 3; do join_chunks "gebang-portable-$i" "gebang-$i.part"; done
+          cat assembled/gebang-{0,1,2,3}.part > assembled/Gebang-Editor-Portable-0.1.27.exe
+
+          wc -c assembled/*
+          file assembled/Gebang-Editor-Portable-0.1.27.exe
+          xz -t assembled/wine-11.22-amd64-wow64.tar.xz
+          xz -t assembled/wine-11.22-staging-amd64-wow64.tar.xz
+          xz -t assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
+          test "$(stat -c '%s' assembled/Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
+          sha256sum assembled/*.tar.xz assembled/*.exe
+
+      - name: Install Wine runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xauth cabextract winbind libfuse2
+
+      - name: Extract Wine and verify runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p wine-runtime
+          tar -xJf assembled/wine-11.22-amd64-wow64.tar.xz -C wine-runtime
+          WINEBIN="$(find "$PWD/wine-runtime" -type f -path '*/bin/wine' | head -n 1)"
+          test -x "$WINEBIN"
+          echo "WINEBIN=$WINEBIN" >> "$GITHUB_ENV"
+          "$WINEBIN" --version
+
+      - name: Attempt Gebang Editor startup under Wine
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          export WINEPREFIX="$PWD/wineprefix"
+          export WINEDEBUG=-all
+          xvfb-run -a timeout 120s "$WINEBIN" wineboot -u > logs/wineboot.log 2>&1
+          BOOT=$?
+          xvfb-run -a timeout 180s "$WINEBIN" assembled/Gebang-Editor-Portable-0.1.27.exe > logs/gebang-startup.log 2>&1
+          APP=$?
+          printf 'wineboot_exit=%s\napp_exit=%s\n' "$BOOT" "$APP" | tee logs/test-result.txt
+          cat logs/gebang-startup.log || true
+          if [ "$APP" -eq 0 ]; then echo "Gebang process exited normally."; fi
+          if [ "$APP" -eq 124 ]; then echo "Gebang remained running until timeout; this can indicate a live GUI process."; fi
+
+      - name: Save test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-wine-test-evidence
+          path: |
+            logs/
+            assembled/*.exe
+            assembled/*.tar.xz
+          if-no-files-found: warn
+          retention-days: 2
