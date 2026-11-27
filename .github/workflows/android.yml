@@ -6,7 +6,7 @@ concurrency:
 
 on:
   push:
-    branches: [ main, feature/opencut-engine-integration ]
+    branches: [ main, feature/opencut-engine-integration, 'port/**' ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
