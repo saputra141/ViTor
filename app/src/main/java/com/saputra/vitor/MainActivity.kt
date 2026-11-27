@@ -98,7 +98,7 @@ private fun ViTorRoot() {
     if (showCatalog) {
         SourceCatalogScreen(onBack = { showCatalog = false })
     } else {
-        ViTorEditor(onOpenCatalog = { showCatalog = true })
+        GebangWorkspace(onOpenCatalog = { showCatalog = true })
     }
 }
 
