@@ -61,7 +61,6 @@ class GlTextureView(
     /** Releases the graphics resources of the view. */
     fun release() {
         stop()
-        renderer.release()
     }
 }
 
@@ -118,6 +117,8 @@ private class RenderThread(
         } catch (error: Throwable) {
             Log.w(TAG, "preview thread stopped", error)
         } finally {
+            // Delete GL objects before tearing down the EGL context that owns them.
+            runCatching { renderer.release() }
             releaseContext()
         }
     }
