@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebKdenlive-Lite | Professional Video Editor</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <header id="top-navigation" class="ui-header">
+        <div class="brand">WebKdenlive-Lite</div>
+        <nav class="menu-bar">
+            <button class="nav-btn">File</button>
+            <button class="nav-btn">Edit</button>
+            <button class="nav-btn">Project</button>
+            <button class="nav-btn">Help</button>
+        </nav>
+        <div class="action-controls">
+            <button id="import-media" class="btn-primary">Import Media</button>
+            <button id="export-render" class="btn-success">Render / Export</button>
+        </div>
+    </header>
+
+    <main id="editor-container">
+        <section id="middle-workspace">
+            <aside id="project-bin" class="pane">
+                <header class="pane-header">Project Bin</header>
+                <div class="media-list" id="assets-list">
+                    <!-- Media assets will be injected here -->
+                </div>
+            </aside>
+
+            <section id="preview-monitor" class="pane">
+                <header class="pane-header">Preview Monitor</header>
+                <div class="canvas-viewport">
+                    <canvas id="editor-canvas"></canvas>
+                </div>
+                <div class="transport-controls">
+                    <button id="play-pause">Play</button>
+                    <button id="stop-clip">Stop</button>
+                    <div class="timecode">00:00:00:00</div>
+                </div>
+            </section>
+
+            <aside id="effect-stack" class="pane">
+                <header class="pane-header">Effect Stack / Properties</header>
+                <div class="properties-panel" id="effect-controls">
+                    <!-- UI for filters and clip properties -->
+                </div>
+            </aside>
+        </section>
+
+        <footer id="timeline-area">
+            <div class="timeline-toolbar">
+                <button class="tool-btn active">Selection</button>
+                <button class="tool-btn">Razor</button>
+                <button class="tool-btn">Spacer</button>
+            </div>
+            <div class="timeline-tracks-container">
+                <div class="track video-track" data-track="V1">
+                    <span class="label">V1</span>
+                    <div class="track-content"></div>
+                </div>
+                <div class="track audio-track" data-track="A1">
+                    <span class="label">A1</span>
+                    <div class="track-content"></div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
