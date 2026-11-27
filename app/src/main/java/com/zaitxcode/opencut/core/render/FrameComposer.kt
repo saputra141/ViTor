@@ -88,6 +88,7 @@ class FrameComposer {
         playheadUs: Long,
         lutTexture: Int = 0,
         lutIntensity: Float = 0f,
+        textureTransform: FloatArray? = null,
     ) {
         val external = layer.kind == LayerKind.VIDEO
         val program = (if (external) externalProgram else plainProgram) ?: return
@@ -126,7 +127,13 @@ class FrameComposer {
 
         GLES20.glUseProgram(program.id)
         GLES20.glUniformMatrix4fv(program.mvp, 1, false, mvp, 0)
-        GLES20.glUniformMatrix4fv(program.texMatrix, 1, false, identityTexMatrix, 0)
+        GLES20.glUniformMatrix4fv(
+            program.texMatrix,
+            1,
+            false,
+            textureTransform ?: identityTexMatrix,
+            0,
+        )
         GLES20.glUniform1f(program.alpha, layer.clip.alpha)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
