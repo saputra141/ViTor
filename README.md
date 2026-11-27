@@ -1,39 +1,68 @@
-# ViTor
+# WebKdenlive-Lite
 
-**ViTor** adalah editor video native Android (Kotlin + Jetpack Compose) untuk ARM64. Aplikasi memakai pipeline decode/render/encode Android, bukan menjalankan aplikasi desktop melalui Wine atau emulator.
+WebKdenlive-Lite is a high-performance, browser-based video and photo editing application inspired by the power and versatility of the KDE Kdenlive project. It provides a professional-grade editing experience directly in the web browser, utilizing modern web technologies like WebAssembly, WebGL, and FFmpeg.wasm.
 
-## Fitur yang sudah ada di kode
+## Key Features
 
-- Impor video, foto, dan audio dari penyimpanan Android; media disalin ke penyimpanan privat aplikasi.
-- Preview timeline berbasis OpenGL dan decoder Android.
-- Multi-track timeline, pilih, pindah, trim, split, duplikasi, dan hapus klip.
-- Undo/redo dan penyimpanan proyek lokal berbasis JSON.
-- Layer teks dan stiker, filter/LUT, adjustment warna, transisi, speed, crop/canvas, serta keyframe.
-- Ekspor MP4 melalui MediaCodec/MediaMuxer dengan pilihan resolusi dan frame rate.
-- Pustaka proyek lokal: buat, buka, duplikasi, dan hapus proyek.
-- Katalog konten Gebang Editor disertakan sebagai metadata sumber.
+- **Non-Linear Video Editing**: A robust multi-track timeline allowing for complex arrangements of video clips, audio tracks, and images.
+- **Canvas-Based Filters**: High-performance image and video processing using WebGL shaders and CSS filters for real-time visual feedback.
+- **Universal Media Support**: Capability to handle various formats directly in the browser via FFmpeg.wasm integration.
+- **Professional Photo Suite**: Integrated photo editing features including layers, blending modes, and non-destructive adjustments.
+- **Browser-Side Rendering**: Fast and private export process that occurs entirely on the client machine.
 
-## Sumber dan batas kompatibilitas Gebang Editor
+## Prerequisites
 
-- Katalog konten resmi: https://github.com/gebangkiidiw/GebangEditor-Konten
-- Katalog JSON berada di `app/src/main/assets/gebang/katalog.json`.
-- Rilis desktop Gebang Editor: https://github.com/gebangkiidiw/GebangEditor-Releases
+Before you begin, ensure you have the following installed:
+- **Node.js**: Version 18.x or higher
+- **npm** or **yarn**: Modern package manager
+- **Modern Browser**: Chrome, Edge, or Firefox (Browsers must support `SharedArrayBuffer` for multi-threaded FFmpeg performance)
 
-Repositori publik Gebang yang tersedia saat integrasi diperiksa menyediakan katalog konten dan binary rilis desktop, bukan source code lengkap mesin editor. Karena itu binary Windows/macOS tidak dapat langsung dipaketkan menjadi APK native, dan ViTor **belum boleh diklaim memiliki seluruh fitur atau kompatibilitas proyek Gebang Editor**. Format preset dan efek Gebang masih perlu dianalisis serta diimplementasikan satu per satu pada engine Android dengan tetap menghormati lisensi dan format sumber.
+## Installation
 
-## Validasi
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/webkdenlive-lite.git
+   cd webkdenlive-lite
+   ```
 
-GitHub Actions menjalankan unit test JVM, build APK debug, dan build APK release unsigned. Kelulusan CI membuktikan kode berhasil diuji/build di runner, bukan pengujian pada perangkat Android fisik. Preview real-time, kompatibilitas codec perangkat, sinkronisasi audio, dan hasil render akhir tetap perlu diuji pada beberapa perangkat ARM64.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-## Build lokal
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
-Dengan JDK 17 dan Gradle 8.9:
+4. **Access the application:**
+   Open [http://localhost:5173](http://localhost:5173) in your web browser.
 
-```bash
-gradle :app:testDebugUnitTest
-gradle :app:assembleDebug
-gradle :app:assembleRelease
-```
+## How to Use
 
-APK debug: `app/build/outputs/apk/debug/app-debug.apk`  
-APK release unsigned: `app/build/outputs/apk/release/app-release-unsigned.apk`
+### Adding Media to the Timeline
+
+1. **Import Assets**: Click the 'Import Media' button in the **Project Bin** (top-left) or simply drag and drop your files from your computer into the bin area.
+2. **Place on Timeline**: Click and hold a clip in the Project Bin, then drag it down onto a **Video Track (V1, V2)** or **Audio Track (A1, A2)** in the timeline.
+3. **Manipulation**: Once on the timeline, you can:
+   - **Move**: Drag the clip left or right to adjust the start time.
+   - **Trim**: Drag the edges of the clip to adjust its duration.
+   - **Split**: Position the playhead and use the 'Razor' tool (C) to cut clips.
+
+### Applying Filters
+
+1. Select a clip in the timeline so it is highlighted.
+2. Go to the **Effects/Filters** tab in the properties panel.
+3. Choose a filter (e.g., Color Correction, Gaussian Blur, or Transform).
+4. Adjust the sliders; the changes will reflect immediately in the **Video Preview** canvas.
+
+## Technical Stack
+
+- **Frontend**: React / TypeScript
+- **Rendering**: HTML5 Canvas / WebGL
+- **Processing**: FFmpeg.wasm
+- **State Management**: Redux Toolkit (Timeline State)
+
+## License
+
+This project is licensed under the GPL-3.0 License - consistent with the Kdenlive open-source philosophy.
