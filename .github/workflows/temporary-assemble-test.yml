@@ -37,6 +37,8 @@ jobs:
           7z x -y -oextracted assembled/Gebang-Editor-Portable.exe
           7z x -y -opayload 'extracted/$PLUGINSDIR/app-64.7z'
           cp payload/resources/app.asar assembled/app.asar
+          test -d payload/resources/app.asar.unpacked
+          cp -a payload/resources/app.asar.unpacked assembled/app.asar.unpacked
           npx --yes @electron/asar extract assembled/app.asar asar-unpacked
 
       - name: Fingerprint app source and assets
