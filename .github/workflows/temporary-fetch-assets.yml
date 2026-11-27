@@ -24,17 +24,9 @@ jobs:
         run: |
           set -euo pipefail
           cd downloads
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o wine-11.22-sha256sums.txt \
-            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/sha256sums.txt
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o wine-11.22-amd64-wow64.tar.xz \
-            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-amd64-wow64.tar.xz
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o wine-11.22-staging-amd64-wow64.tar.xz \
-            https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-staging-amd64-wow64.tar.xz
-          grep -F 'wine-11.22-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt
-          grep -F 'wine-11.22-staging-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-11.22-sha256sums.txt https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/sha256sums.txt
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-11.22-amd64-wow64.tar.xz https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-amd64-wow64.tar.xz
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-11.22-staging-amd64-wow64.tar.xz https://github.com/Kron4ek/Wine-Builds/releases/download/11.22/wine-11.22-staging-amd64-wow64.tar.xz
           sha256sum -c <(grep -F 'wine-11.22-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
           sha256sum -c <(grep -F 'wine-11.22-staging-amd64-wow64.tar.xz' wine-11.22-sha256sums.txt)
 
@@ -43,13 +35,8 @@ jobs:
         run: |
           set -euo pipefail
           cd downloads
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o wine-proton-11.0-3-amd64-wow64.tar.xz \
-            https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/wine-proton-11.0-3-amd64-wow64.tar.xz
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o wine-proton-11.0-3-sha256sums.txt \
-            https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/sha256sums.txt
-          grep -F 'wine-proton-11.0-3-amd64-wow64.tar.xz' wine-proton-11.0-3-sha256sums.txt
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-proton-11.0-3-amd64-wow64.tar.xz https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/wine-proton-11.0-3-amd64-wow64.tar.xz
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o wine-proton-11.0-3-sha256sums.txt https://github.com/Kron4ek/Wine-Builds/releases/download/proton-11.0-3/sha256sums.txt
           sha256sum -c <(grep -F 'wine-proton-11.0-3-amd64-wow64.tar.xz' wine-proton-11.0-3-sha256sums.txt)
 
       - name: Download official Gebang Editor installers
@@ -57,12 +44,8 @@ jobs:
         run: |
           set -euo pipefail
           cd downloads
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o Gebang-Editor-Portable-0.1.27.exe \
-            https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Portable-0.1.27.exe
-          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 \
-            -o Gebang-Editor-Setup-0.1.27.exe \
-            https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Setup-0.1.27.exe
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o Gebang-Editor-Portable-0.1.27.exe https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Portable-0.1.27.exe
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o Gebang-Editor-Setup-0.1.27.exe https://github.com/gebangkiidiw/GebangEditor-Releases/releases/download/v0.1.27/Gebang-Editor-Setup-0.1.27.exe
           test "$(stat -c '%s' Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
           test "$(stat -c '%s' Gebang-Editor-Setup-0.1.27.exe)" = "358978104"
 
@@ -86,11 +69,49 @@ jobs:
             ls -lh *.tar.xz *.exe
           } > DOWNLOAD-MANIFEST.txt
 
-      - name: Upload downloaded assets
+      - name: Upload Wine 11.22 builds
         uses: actions/upload-artifact@v4
         with:
-          name: wine-gebang-downloads
-          path: downloads/
+          name: wine-11.22-builds
+          path: |
+            downloads/wine-11.22-amd64-wow64.tar.xz
+            downloads/wine-11.22-staging-amd64-wow64.tar.xz
+            downloads/wine-11.22-sha256sums.txt
+            downloads/DOWNLOAD-MANIFEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Proton-compatible Wine build
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-proton-11.0-3
+          path: |
+            downloads/wine-proton-11.0-3-amd64-wow64.tar.xz
+            downloads/wine-proton-11.0-3-sha256sums.txt
+            downloads/DOWNLOAD-MANIFEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang Editor Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-editor-portable-0.1.27
+          path: |
+            downloads/Gebang-Editor-Portable-0.1.27.exe
+            downloads/DOWNLOAD-MANIFEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
+
+      - name: Upload Gebang Editor Setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: gebang-editor-setup-0.1.27
+          path: |
+            downloads/Gebang-Editor-Setup-0.1.27.exe
+            downloads/DOWNLOAD-MANIFEST.txt
           if-no-files-found: error
           compression-level: 0
           retention-days: 2
