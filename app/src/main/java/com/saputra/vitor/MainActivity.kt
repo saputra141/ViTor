@@ -8,18 +8,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import com.zaitxcode.opencut.ui.editor.EditorScreen
-import com.zaitxcode.opencut.ui.export.ExportScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme(colorScheme = darkColorScheme(
-                primary = Color(0xFF9B8CFF),
+                primary = Color(0xFF3DAEE9),
                 secondary = Color(0xFF56D6C2),
-                background = Color(0xFF101116),
-                surface = Color(0xFF1B1D26)
+                background = Color(0xFF17191D),
+                surface = Color(0xFF22252B)
             )) {
                 var projectId by remember { mutableStateOf<String?>(null) }
                 var showExport by remember { mutableStateOf(false) }
@@ -29,11 +27,11 @@ class MainActivity : ComponentActivity() {
                 }
 
                 when {
-                    showExport && projectId != null -> ExportScreen(
+                    showExport && projectId != null -> com.zaitxcode.opencut.ui.export.ExportScreen(
                         projectId = projectId!!,
                         onBack = { showExport = false },
                     )
-                    projectId != null -> EditorScreen(
+                    projectId != null -> KdenliveWorkspaceScreen(
                         projectId = projectId!!,
                         onBack = { projectId = null },
                         onExport = { showExport = true },
