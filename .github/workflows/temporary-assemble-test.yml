@@ -1,4 +1,4 @@
-name: Temporary Gebang binary diagnostics
+name: Inspect Gebang application package
 on:
   push:
     branches:
@@ -11,109 +11,59 @@ permissions:
   actions: read
 
 jobs:
-  diagnose:
+  inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
-      - name: Prepare folders
-        run: mkdir -p input assembled logs extracted wine-runtime
+      - name: Prepare
+        run: mkdir -p input assembled extracted payload logs
 
-      - name: Download verified transfer artifacts
+      - name: Download verified original assets
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 45920868698 --repo saputra141/ViTor --dir input
 
-      - name: Reassemble original files
+      - name: Reassemble portable executable
         shell: bash
         run: |
           set -euo pipefail
-          join_chunks() {
-            find "input/$1" -type f -print0 | sort -z | xargs -0 cat > "assembled/$2"
-            test -s "assembled/$2"
-          }
-          join_chunks wine-stable-0 wine-stable.part0
-          join_chunks wine-stable-1 wine-stable.part1
-          cat assembled/wine-stable.part0 assembled/wine-stable.part1 > assembled/wine-11.22-amd64-wow64.tar.xz
-          for i in 0 1; do join_chunks "wine-staging-$i" "wine-staging.part$i"; done
-          cat assembled/wine-staging.part0 assembled/wine-staging.part1 > assembled/wine-11.22-staging-amd64-wow64.tar.xz
-          join_chunks wine-proton-0 wine-proton.part0
-          cp assembled/wine-proton.part0 assembled/wine-proton-11.0-3-amd64-wow64.tar.xz
-          for i in 0 1 2 3; do join_chunks "gebang-portable-$i" "gebang-$i.part"; done
-          cat assembled/gebang-{0,1,2,3}.part > assembled/Gebang-Editor-Portable-0.1.27.exe
-          test "$(stat -c '%s' assembled/Gebang-Editor-Portable-0.1.27.exe)" = "351939602"
-          sha256sum assembled/*.tar.xz assembled/*.exe | tee logs/sha256.txt
-          xz -t assembled/*.tar.xz
-
-      - name: Inspect Gebang executable payload
-        shell: bash
-        run: |
-          set -euo pipefail
+          for i in 0 1 2 3; do
+            find "input/gebang-portable-$i" -type f -print0 | sort -z | xargs -0 cat > "assembled/part$i"
+          done
+          cat assembled/part{0,1,2,3} > assembled/Gebang-Editor-Portable.exe
+          test "$(stat -c '%s' assembled/Gebang-Editor-Portable.exe)" = "351939602"
           sudo apt-get update
           sudo apt-get install -y p7zip-full file binutils
-          file assembled/Gebang-Editor-Portable-0.1.27.exe | tee logs/file-type.txt
-          7z l assembled/Gebang-Editor-Portable-0.1.27.exe > logs/archive-list.txt 2>&1 || true
-          7z x -y -oextracted assembled/Gebang-Editor-Portable-0.1.27.exe > logs/archive-extract.txt 2>&1 || true
-          find extracted -type f -printf '%p %s bytes\n' | sort > logs/extracted-files.txt
-          find extracted -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.node' \) -print0 | xargs -0 -r file > logs/payload-binaries.txt
-          grep -Eio 'electron|chromium|qt[0-9]?|unity|unreal|godot|dotnet|\.net|webview2|nsis|inno setup' logs/archive-list.txt | sort -u > logs/technology-hints.txt || true
-          {
-            echo '=== FILE TYPE ==='; cat logs/file-type.txt
-            echo '=== TECH HINTS ==='; cat logs/technology-hints.txt
-            echo '=== EXTRACTED FILES ==='; sed -n '1,240p' logs/extracted-files.txt
-            echo '=== BINARY TYPES ==='; sed -n '1,160p' logs/payload-binaries.txt
-            echo '=== ARCHIVE HEADER ==='; sed -n '1,100p' logs/archive-list.txt
-          } | tee logs/payload-summary.txt
+          7z x -y -oextracted assembled/Gebang-Editor-Portable.exe
+          test -s 'extracted/$PLUGINSDIR/app-64.7z'
 
-      - name: Install diagnostic runtime dependencies
-        run: sudo apt-get install -y xvfb xauth cabextract winbind libfuse2 imagemagick xdotool wmctrl
-
-      - name: Extract and verify Wine
+      - name: Extract and fingerprint the actual app payload
         shell: bash
         run: |
           set -euo pipefail
-          tar -xJf assembled/wine-11.22-amd64-wow64.tar.xz -C wine-runtime
-          WINEBIN="$(find "$PWD/wine-runtime" -type f -path '*/bin/wine' | head -n 1)"
-          test -x "$WINEBIN"
-          echo "WINEBIN=$WINEBIN" >> "$GITHUB_ENV"
-          echo "WINEBIN=$WINEBIN" | tee logs/wine-path.txt
-          "$WINEBIN" --version | tee logs/wine-version.txt
-
-      - name: Launch app directly with fresh Wine prefix
-        shell: bash
-        continue-on-error: true
-        run: |
-          set +e
-          export PATH="$(dirname "$WINEBIN"):$PATH"
-          export WINEPREFIX="$PWD/wineprefix-direct"
-          export WINEDEBUG=+err,+warn
-          xvfb-run -a -s "-screen 0 1440x900x24" bash -c '
-            mkdir -p logs
-            echo "Launching Gebang directly; Wine will initialize prefix itself."
-            (timeout 240s "$WINEBIN" "$PWD/assembled/Gebang-Editor-Portable-0.1.27.exe" > logs/gebang-direct.log 2>&1) &
-            APP_PID=$!
-            echo "app_pid=$APP_PID" > logs/direct-exit.txt
-            sleep 75
-            import -window root logs/desktop-direct-75s.png 2> logs/screenshot-error.txt
-            wmctrl -lp > logs/windows.txt 2>&1
-            xdotool search --onlyvisible --name "." getwindowname %@ > logs/window-titles.txt 2>&1
-            ps -ef | grep -Ei "wine|gebang|explorer|services.exe" | grep -v grep > logs/processes.txt
-            wait "$APP_PID"
-            echo "app_exit=$?" >> logs/direct-exit.txt
-          '
-          echo "Direct launch diagnostic completed."
+          7z l 'extracted/$PLUGINSDIR/app-64.7z' > logs/app-archive-list.txt
+          7z x -y -opayload 'extracted/$PLUGINSDIR/app-64.7z' > logs/app-extract.txt
+          find payload -type f -printf '%p %s bytes\n' | sort > logs/payload-files.txt
+          find payload -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.node' -o -iname '*.so' \) -print0 | xargs -0 -r file > logs/payload-binaries.txt
+          find payload -type f \( -iname 'package.json' -o -iname '*.asar' -o -iname 'electron.asar' -o -iname 'app.asar' -o -iname 'manifest.json' \) -print > logs/package-markers.txt
+          grep -RIlE 'electron|chromium|react|vue|angular|tauri|webview2|ffmpeg|sharp|canvas|\.NET|dotnet|qt' payload --include='package.json' --include='*.json' --include='*.yml' --include='*.yaml' --include='*.txt' 2>/dev/null | head -n 100 > logs/technology-files.txt || true
           {
-            echo '=== DIRECT EXIT ==='; cat logs/direct-exit.txt 2>/dev/null
-            echo '=== WINDOWS ==='; cat logs/windows.txt 2>/dev/null
-            echo '=== WINDOW TITLES ==='; cat logs/window-titles.txt 2>/dev/null
-            echo '=== PROCESSES ==='; cat logs/processes.txt 2>/dev/null
-            echo '=== APP LOG TAIL ==='; tail -n 160 logs/gebang-direct.log 2>/dev/null
-          } | tee logs/launch-summary.txt
+            echo '=== NESTED ARCHIVE ==='
+            sed -n '1,180p' logs/app-archive-list.txt
+            echo '=== APP FILES ==='
+            sed -n '1,260p' logs/payload-files.txt
+            echo '=== BINARY TYPES ==='
+            cat logs/payload-binaries.txt
+            echo '=== PACKAGE MARKERS ==='
+            cat logs/package-markers.txt
+            echo '=== TECHNOLOGY FILES ==='
+            cat logs/technology-files.txt
+          } | tee logs/summary.txt
 
-      - name: Upload diagnostic evidence
+      - name: Upload package inspection
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gebang-direct-launch-diagnostics
+          name: gebang-package-inspection
           path: logs/
-          if-no-files-found: warn
           retention-days: 3
