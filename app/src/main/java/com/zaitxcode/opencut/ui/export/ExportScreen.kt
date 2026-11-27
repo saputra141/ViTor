@@ -67,7 +67,7 @@ fun ExportScreen(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as OpenCutApp
+    val app = context.applicationContext as ViTorApplication
     val scope = rememberCoroutineScopeCompat()
 
     var project by remember { mutableStateOf<Project?>(null) }
@@ -194,7 +194,7 @@ fun ExportScreen(
                 OutlinedButton(onClick = {
                     val uri = FileProvider.getUriForFile(
                         context,
-                        "${app.packageName}.fileprovider",
+                        "${context.packageName}.fileprovider",
                         file,
                     )
                     val intent = Intent(Intent.ACTION_VIEW)
